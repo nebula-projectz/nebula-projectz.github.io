@@ -1,578 +1,491 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nebula Files — A file manager from the future</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #07090f;
-    --surface: #0d1021;
-    --border: rgba(255,255,255,0.07);
-    --accent: #7c5cfc;
-    --accent2: #3ecfff;
-    --text: #e8eaf0;
-    --muted: rgba(255,255,255,0.4);
-  }
+[data-theme="dark"] {
+  --bg: #020810;
+  --surface: #0a1628;
+  --surface2: #0f1e35;
+  --border: rgba(6,182,212,0.12);
+  --border2: rgba(6,182,212,0.22);
+  --accent: #06b6d4;
+  --accent2: #3b82f6;
+  --accent-glow: rgba(6,182,212,0.18);
+  --text: #e2f4f8;
+  --text2: #7eb8c9;
+  --text3: #3a6b7a;
+  --code-bg: #030d1a;
+  --code-text: #67e8f9;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --shadow: 0 25px 60px rgba(0,0,0,0.7);
+}
+[data-theme="light"] {
+  --bg: #f0f9ff;
+  --surface: #ffffff;
+  --surface2: #e0f2fe;
+  --border: rgba(6,182,212,0.18);
+  --border2: rgba(6,182,212,0.3);
+  --accent: #0891b2;
+  --accent2: #2563eb;
+  --accent-glow: rgba(8,145,178,0.12);
+  --text: #0c2340;
+  --text2: #1e6080;
+  --text3: #7eb8c9;
+  --code-bg: #0f2030;
+  --code-text: #67e8f9;
+  --success: #059669;
+  --warning: #d97706;
+  --shadow: 0 25px 60px rgba(0,0,0,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; overflow-x:hidden; transition:background .4s,color .4s; }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+#bg-canvas { position:fixed; inset:0; z-index:1; pointer-events:none; }
+.mesh-blob { position:fixed; pointer-events:none; z-index:2; border-radius:50%; filter:blur(80px); opacity:0.18; }
+.blob1 { width:700px; height:700px; background:radial-gradient(circle,#06b6d4,transparent 70%); top:-150px; left:-100px; animation:bm1 18s ease-in-out infinite; }
+.blob2 { width:600px; height:600px; background:radial-gradient(circle,#3b82f6,transparent 70%); bottom:-100px; right:-100px; animation:bm2 22s ease-in-out infinite; }
+.blob3 { width:450px; height:450px; background:radial-gradient(circle,#0891b2,transparent 70%); top:40%; left:40%; animation:bm3 15s ease-in-out infinite; }
+@keyframes bm1 { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(120px,80px) scale(1.1);} 66%{transform:translate(-60px,140px) scale(0.9);} }
+@keyframes bm2 { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(-100px,-60px) scale(1.15);} 66%{transform:translate(80px,-120px) scale(0.95);} }
+@keyframes bm3 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-80px,60px) scale(1.2);} }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+/* NAV */
+nav { position:fixed; top:0; left:0; right:0; z-index:200; height:58px; padding:0 48px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:color-mix(in srgb,var(--bg) 60%,transparent);
+  backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-bottom:1px solid var(--border); }
+.nav-left { display:flex; align-items:center; gap:20px; }
+.nav-logo { font-family:'Space Mono',monospace; font-weight:700; font-size:15px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; }
+.nav-sep { color:var(--text3); }
+.nav-page { font-size:13px; color:var(--text2); font-weight:500; }
+.nav-right { display:flex; align-items:center; gap:6px; }
+.nav-link { color:var(--text2); text-decoration:none; font-size:13px; font-weight:500; padding:6px 12px; border-radius:7px; transition:all .15s; }
+.nav-link:hover { color:var(--text); background:rgba(6,182,212,0.08); }
+.settings-wrap { position:relative; }
+.settings-btn { display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:8px;
+  border:1px solid var(--border); background:var(--surface); color:var(--text2); cursor:pointer; font-size:15px; transition:all .15s; }
+.settings-btn:hover { border-color:var(--accent); color:var(--accent); }
+.settings-panel { position:absolute; top:42px; right:0; width:250px; background:var(--surface);
+  border:1px solid var(--border2); border-radius:14px; padding:16px;
+  box-shadow:var(--shadow); display:none; flex-direction:column; gap:14px; z-index:300; }
+.settings-panel.open { display:flex; }
+.settings-title { font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text3); padding-bottom:10px; border-bottom:1px solid var(--border); }
+.setting-row { display:flex; align-items:center; justify-content:space-between; font-size:13px; }
+.setting-row > span { font-weight:500; color:var(--text); }
+.toggle { position:relative; width:40px; height:22px; cursor:pointer; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-track { position:absolute; inset:0; border-radius:11px; background:var(--surface2); border:1px solid var(--border2); transition:background .2s; }
+.toggle input:checked + .toggle-track { background:var(--accent); border-color:var(--accent); }
+.toggle-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:white; transition:transform .2s; box-shadow:0 1px 3px rgba(0,0,0,.3); }
+.toggle input:checked ~ .toggle-thumb { transform:translateX(18px); }
 
-  .bg-grid {
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(124,92,252,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(124,92,252,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    pointer-events: none;
-  }
+/* HERO */
+.hero { padding:100px 48px 70px; max-width:1100px; margin:0 auto;
+  display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; position:relative; }
+.hero-back { display:inline-flex; align-items:center; gap:5px; color:var(--text3); text-decoration:none;
+  font-size:12px; font-weight:500; margin-bottom:18px; transition:color .15s; }
+.hero-back:hover { color:var(--accent); }
+.hero-badge { display:inline-flex; align-items:center; gap:7px; background:rgba(6,182,212,0.1);
+  border:1px solid rgba(6,182,212,0.25); border-radius:6px; padding:4px 12px; margin-bottom:16px;
+  font-size:11px; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+.hero h1 { font-family:'Space Mono',monospace; font-weight:700; font-size:clamp(30px,4vw,52px);
+  line-height:1.1; letter-spacing:-1.5px; margin-bottom:6px;
+  background:linear-gradient(135deg,#e2f4f8 0%,#22d3ee 50%,#3b82f6 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero-ver { font-family:'Space Mono',monospace; font-size:11px; color:var(--text3); margin-bottom:16px; }
+.hero p { font-size:15px; color:var(--text2); line-height:1.75; margin-bottom:28px; }
+.hero-btns { display:flex; gap:10px; flex-wrap:wrap; }
+.btn-p { padding:10px 22px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; border-radius:8px;
+  text-decoration:none; font-size:13px; font-weight:600; transition:all .2s; display:inline-flex; align-items:center; gap:7px; border:none; }
+.btn-p:hover { filter:brightness(1.15); transform:translateY(-1px); box-shadow:0 8px 25px rgba(6,182,212,0.3); }
+.btn-o { padding:10px 22px; background:transparent; color:var(--text); border-radius:8px; text-decoration:none;
+  font-size:13px; font-weight:600; border:1px solid var(--border2); transition:all .2s; display:inline-flex; align-items:center; gap:7px; }
+.btn-o:hover { border-color:var(--accent); color:var(--accent); }
 
-  /* Nav */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 20px 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(7,9,15,0.8);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-  }
+/* MOCKUP */
+.mockup { position:relative; z-index:3; border-radius:14px; overflow:hidden;
+  box-shadow:0 0 0 1px rgba(6,182,212,0.25), 0 30px 80px rgba(0,0,0,0.6), 0 0 60px rgba(6,182,212,0.06);
+  backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px); background:transparent; }
+.mbar { background:rgba(2,8,18,0.88); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  padding:9px 14px; display:flex; align-items:center; gap:7px; border-bottom:1px solid rgba(6,182,212,0.15); }
+[data-theme="light"] .mockup { box-shadow:0 0 0 1px rgba(6,182,212,0.3), 0 30px 80px rgba(0,0,0,0.2); }
+[data-theme="light"] .mbar { background:rgba(255,255,255,0.7); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
+.md { width:10px; height:10px; border-radius:50%; }
+.md.r{background:#ff5f57;} .md.y{background:#febc2e;} .md.g{background:#28c840;}
+.mtitle { flex:1; text-align:center; font-size:10px; color:var(--text3); font-family:'Space Mono',monospace; }
+.mbody { display:flex; height:280px; }
+.msidebar { width:140px; background:rgba(2,8,20,0.82); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+  padding:10px 6px; border-right:1px solid rgba(6,182,212,0.12); }
+[data-theme="light"] .msidebar { background:rgba(200,230,255,0.65); }
+.mi { padding:6px 10px; border-radius:6px; color:var(--text3); font-size:10px; display:flex; align-items:center; gap:7px; margin-bottom:2px; transition:all .15s; }
+.mi.a { background:rgba(6,182,212,0.2); color:var(--accent); }
+.mdot { width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.4; flex-shrink:0; }
+.mi.a .mdot { opacity:1; }
+.mfiles { flex:1; padding:14px; display:grid; grid-template-columns:repeat(4,1fr); gap:10px; align-content:start;
+  background:rgba(1,5,14,0.72); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%); }
+[data-theme="light"] .mfiles { background:rgba(180,220,255,0.4); }
+.mf { display:flex; flex-direction:column; align-items:center; gap:5px; }
+.mfi { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+.mfn { font-size:8px; color:var(--text3); text-align:center; }
 
-  .nav-logo {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
-    font-size: 18px;
-    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-decoration: none;
-  }
+/* SECTIONS */
+.sec { padding:64px 48px; max-width:1100px; margin:0 auto; position:relative; isolation:auto; }
+.eyebrow { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:8px; font-weight:700; }
+.sec-title { font-family:'Space Mono',monospace; font-weight:700; font-size:clamp(20px,3vw,30px); letter-spacing:-1px; margin-bottom:8px; color:var(--text); }
+.sec-sub { font-size:15px; color:var(--text2); line-height:1.6; margin-bottom:40px; }
 
-  .nav-links {
-    display: flex;
-    gap: 32px;
-    list-style: none;
-  }
+/* FEATURES */
+.feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.fc { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px; transition:all .2s; backdrop-filter:blur(40px); -webkit-backdrop-filter:blur(40px); }
+.fc:hover { border-color:rgba(6,182,212,0.38); transform:translateY(-2px); box-shadow:0 8px 30px rgba(6,182,212,0.1); background:var(--surface2); }
+.fi { font-size:22px; margin-bottom:10px; }
+.fc h3 { font-size:13px; font-weight:600; margin-bottom:5px; color:var(--text); }
+.fc p { font-size:12px; color:var(--text2); line-height:1.6; }
 
-  .nav-links a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
+/* DOWNLOADS */
+.dl-list { display:flex; flex-direction:column; gap:10px; }
+.dl-row { background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:18px 22px;
+  display:grid; grid-template-columns:48px 1fr auto; gap:16px; align-items:center; transition:all .2s; }
+.dl-row:hover:not(.soon) { border-color:rgba(6,182,212,0.35); box-shadow:0 4px 20px rgba(6,182,212,0.08); }
+.dl-row.soon { opacity:.5; }
+.dl-icon { width:48px; height:48px; border-radius:10px; background:rgba(6,182,212,0.07);
+  border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.dl-icon svg { width:26px; height:26px; }
+.dl-info h3 { font-size:14px; font-weight:600; margin-bottom:3px; color:var(--text); display:flex; align-items:center; gap:8px; }
+.dl-info p { font-size:12px; color:var(--text2); margin-bottom:7px; }
+.dl-cmd { display:flex; align-items:center; gap:8px; background:var(--code-bg); border-radius:6px;
+  padding:6px 10px; font-family:'Space Mono',monospace; font-size:11px; color:var(--code-text);
+  border:1px solid rgba(6,182,212,0.1); overflow-x:auto; }
+.cp { background:none; border:none; cursor:pointer; color:var(--text3); padding:2px 4px; border-radius:4px; font-size:12px; flex-shrink:0; transition:color .15s; }
+.cp:hover { color:var(--accent); }
+.dl-acts { display:flex; flex-direction:column; gap:6px; align-items:flex-end; flex-shrink:0; }
+.dl-btn { padding:8px 18px; border-radius:7px; font-size:12px; font-weight:600; text-decoration:none; transition:all .2s; white-space:nowrap; text-align:center; }
+.dl-btn.av { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; }
+.dl-btn.av:hover { filter:brightness(1.15); box-shadow:0 4px 15px rgba(6,182,212,0.3); }
+.dl-btn.na { background:var(--surface2); color:var(--text3); border:1px solid var(--border); cursor:not-allowed; font-size:11px; }
+.badge { font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; padding:2px 8px; border-radius:4px; }
+.b-ok { background:rgba(16,185,129,.15); color:var(--success); border:1px solid rgba(16,185,129,.25); }
+.b-soon { background:rgba(245,158,11,.15); color:var(--warning); border:1px solid rgba(245,158,11,.25); }
+.b-pend { background:rgba(6,182,212,.15); color:var(--accent); border:1px solid rgba(6,182,212,.25); }
 
-  .nav-links a:hover { color: var(--text); }
+footer { border-top:1px solid var(--border); padding:28px 48px; text-align:center; color:var(--text3); font-size:12px; position:relative; z-index:1; margin-top:32px; }
+footer a { color:var(--accent); text-decoration:none; }
 
-  /* Hero */
-  .hero {
-    padding: 160px 60px 100px;
-    max-width: 1100px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
-  }
+/* THEME SWITCHER PILL */
+.theme-pill {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  z-index:500; display:flex; align-items:center; gap:2px;
+  background:color-mix(in srgb,var(--surface) 70%,transparent);
+  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border2); border-radius:50px;
+  padding:5px; box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  transition:all .3s;
+}
+.theme-pill:hover { box-shadow:0 12px 40px rgba(6,182,212,0.2), 0 0 0 1px rgba(6,182,212,0.15); }
+.pill-btn {
+  display:flex; align-items:center; gap:7px; padding:7px 16px; border-radius:40px;
+  border:none; cursor:pointer; font-family:'Inter',sans-serif; font-size:12px; font-weight:600;
+  background:transparent; color:var(--text3); transition:all .2s;
+}
+.pill-btn.active { background:var(--accent); color:white; box-shadow:0 2px 12px rgba(6,182,212,0.4); }
+.pill-btn:not(.active):hover { color:var(--text); background:rgba(255,255,255,0.05); }
+.pill-sep { width:1px; height:20px; background:var(--border2); margin:0 2px; }
+.pill-collapse {
+  display:flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:50%; border:none;
+  background:transparent; color:var(--text3); cursor:pointer;
+  transition:all .2s; margin-left:2px; flex-shrink:0;
+}
+.pill-collapse:hover { color:var(--accent); background:rgba(6,182,212,0.1); }
+.pill-collapse svg { transition:transform .3s; }
+.pill-collapse.collapsed svg { transform:rotate(180deg); }
+.pill-inner { display:flex; align-items:center; gap:2px; overflow:hidden;
+  max-width:200px; transition:max-width .35s ease, opacity .3s ease; opacity:1; }
+.pill-inner.hidden { max-width:0; opacity:0; pointer-events:none; }
 
-  .hero-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 13px;
-    margin-bottom: 24px;
-    transition: color 0.2s;
-  }
+/* FEATURE SVG ICONS */
+.fi { width:40px; height:40px; border-radius:10px; background:rgba(6,182,212,0.1);
+  border:1px solid rgba(6,182,212,0.18); display:flex; align-items:center; justify-content:center;
+  margin-bottom:14px; }
+.fi svg { width:20px; height:20px; }
 
-  .hero-back:hover { color: var(--text); }
-
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(124,92,252,0.15);
-    border: 1px solid rgba(124,92,252,0.3);
-    border-radius: 20px;
-    padding: 6px 16px;
-    margin-bottom: 24px;
-    font-size: 12px;
-    color: #a78bfa;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
-
-  .hero h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
-    font-size: clamp(36px, 5vw, 64px);
-    line-height: 1.05;
-    letter-spacing: -2px;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 60%, var(--accent2) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .hero-sub {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
-    color: rgba(255,255,255,0.2);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-  }
-
-  .hero p {
-    font-size: 16px;
-    color: var(--muted);
-    line-height: 1.7;
-    margin-bottom: 36px;
-    font-weight: 300;
-  }
-
-  .hero-btns {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .btn-primary {
-    padding: 12px 28px;
-    background: var(--accent);
-    color: white;
-    border-radius: 10px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s;
-    border: 1px solid transparent;
-  }
-
-  .btn-primary:hover {
-    background: #6b4ee6;
-    transform: translateY(-1px);
-  }
-
-  .btn-secondary {
-    padding: 12px 28px;
-    background: transparent;
-    color: var(--text);
-    border-radius: 10px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s;
-    border: 1px solid var(--border);
-  }
-
-  .btn-secondary:hover {
-    border-color: rgba(124,92,252,0.4);
-    background: rgba(124,92,252,0.08);
-  }
-
-  /* App mockup */
-  .hero-mockup {
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
-    background: #0e1120;
-  }
-
-  .mockup-bar {
-    background: #12162a;
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-  }
-
-  .dot { width: 11px; height: 11px; border-radius: 50%; }
-  .dot.r { background: #ff5f57; }
-  .dot.y { background: #febc2e; }
-  .dot.g { background: #28c840; }
-
-  .mockup-title {
-    flex: 1;
-    text-align: center;
-    font-size: 11px;
-    color: rgba(255,255,255,0.3);
-  }
-
-  .mockup-body {
-    display: flex;
-    height: 280px;
-  }
-
-  .mockup-sidebar {
-    width: 140px;
-    background: #0a0d1a;
-    padding: 10px 6px;
-    border-right: 1px solid rgba(255,255,255,0.04);
-  }
-
-  .mockup-item {
-    padding: 6px 10px;
-    border-radius: 6px;
-    color: rgba(255,255,255,0.4);
-    font-size: 11px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin-bottom: 2px;
-    font-family: 'DM Sans', sans-serif;
-  }
-
-  .mockup-item.active {
-    background: rgba(124,92,252,0.2);
-    color: #fff;
-  }
-
-  .mockup-dot {
-    width: 7px; height: 7px;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.15);
-  }
-
-  .mockup-item.active .mockup-dot { background: #7c5cfc; }
-
-  .mockup-files {
-    flex: 1;
-    padding: 14px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    align-content: start;
-  }
-
-  .mockup-file {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .mockup-file-icon {
-    width: 44px; height: 44px;
-    border-radius: 9px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-  }
-
-  .mockup-file-name {
-    font-size: 9px;
-    color: rgba(255,255,255,0.4);
-    text-align: center;
-    font-family: 'DM Sans', sans-serif;
-  }
-
-  /* Features */
-  .features {
-    padding: 80px 60px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  .section-header {
-    text-align: center;
-    margin-bottom: 60px;
-  }
-
-  .section-header h2 {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    font-size: 32px;
-    margin-bottom: 12px;
-    letter-spacing: -1px;
-  }
-
-  .section-header p {
-    color: var(--muted);
-    font-size: 16px;
-    font-weight: 300;
-  }
-
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-  }
-
-  .feature-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    transition: border-color 0.2s;
-  }
-
-  .feature-card:hover { border-color: rgba(124,92,252,0.3); }
-
-  .feature-icon {
-    font-size: 28px;
-    margin-bottom: 14px;
-  }
-
-  .feature-card h3 {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 8px;
-  }
-
-  .feature-card p {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.6;
-    font-weight: 300;
-  }
-
-  /* Downloads */
-  .downloads {
-    padding: 80px 60px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  .downloads-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-  }
-
-  .download-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
-    text-align: center;
-    transition: all 0.2s;
-  }
-
-  .download-card:hover {
-    border-color: rgba(124,92,252,0.3);
-    transform: translateY(-2px);
-  }
-
-  .download-icon { font-size: 28px; margin-bottom: 12px; }
-
-  .download-card h3 {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 6px;
-  }
-
-  .download-card p {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 16px;
-    font-weight: 300;
-  }
-
-  .download-btn {
-    display: inline-block;
-    padding: 8px 20px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s;
-  }
-
-  .download-btn.available {
-    background: var(--accent);
-    color: white;
-  }
-
-  .download-btn.available:hover { background: #6b4ee6; }
-
-  .download-btn.soon {
-    background: rgba(255,255,255,0.05);
-    color: var(--muted);
-    border: 1px solid var(--border);
-    cursor: not-allowed;
-  }
-
-  /* Footer */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 40px 60px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 13px;
-    margin-top: 40px;
-  }
-
-  footer a { color: var(--accent); text-decoration: none; }
-
-  @media (max-width: 768px) {
-    nav { padding: 16px 24px; }
-    .hero { grid-template-columns: 1fr; padding: 120px 24px 60px; gap: 40px; }
-    .features { padding: 60px 24px; }
-    .features-grid { grid-template-columns: 1fr; }
-    .downloads { padding: 60px 24px; }
-    footer { padding: 32px 24px; }
-    .nav-links { display: none; }
-  }
+@media(max-width:800px){
+  nav{padding:0 18px;}
+  .hero{grid-template-columns:1fr;padding:85px 18px 50px;gap:36px;}
+  .sec{padding:48px 18px;}
+  .feat-grid{grid-template-columns:1fr;}
+  .dl-row{grid-template-columns:48px 1fr;}.dl-acts{grid-column:1/-1;flex-direction:row;}
+  footer{padding:22px 18px;}
+}
 </style>
 </head>
 <body>
 
-<div class="bg-grid"></div>
+<canvas id="bg-canvas"></canvas>
+<div class="mesh-blob blob1"></div>
+<div class="mesh-blob blob2"></div>
+<div class="mesh-blob blob3"></div>
 
 <nav>
-  <a href="index.html" class="nav-logo">NEBULA</a>
-  <ul class="nav-links">
-    <li><a href="#features">Features</a></li>
-    <li><a href="#downloads">Downloads</a></li>
-    <li><a href="https://github.com/VisorVP/nebula-files" target="_blank">GitHub</a></li>
-  </ul>
+  <div class="nav-left">
+    <a href="index.html" class="nav-logo">NEBULA</a>
+    <span class="nav-sep">/</span>
+    <span class="nav-page">Nebula Files</span>
+  </div>
+  <div class="nav-right">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#downloads" class="nav-link">Downloads</a>
+    <a href="https://github.com/VisorVP/nebula-files" target="_blank" class="nav-link">GitHub</a>
+    <div class="settings-wrap">
+      <button class="settings-btn" onclick="toggleSettings()" title="Settings">⚙</button>
+      <div class="settings-panel" id="sp">
+        <div class="settings-title">Preferences</div>
+        <div class="setting-row">
+          <span>Dark Mode</span>
+          <label class="toggle"><input type="checkbox" id="darkT" checked onchange="setTheme(this)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="setting-row">
+          <span>Show Commands</span>
+          <label class="toggle"><input type="checkbox" id="cmdT" checked onchange="showCmds(this)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="setting-row">
+          <span>Animations</span>
+          <label class="toggle"><input type="checkbox" id="animT" checked onchange="toggleAnim(this)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+      </div>
+    </div>
+  </div>
 </nav>
 
+<main>
 <section class="hero">
-  <div class="hero-content">
-    <a href="index.html" class="hero-back">← Back to all apps</a>
-    <div class="hero-badge">File Manager</div>
-    <h1>Nebula Files</h1>
-    <div class="hero-sub">GTK4 · Linux · Open Source</div>
-    <p>A modern file manager with multiple themes, cloud drive integration (OneDrive & Google Drive), split view, tabbed browsing, and customizable keyboard shortcuts.</p>
+  <div>
+    <a href="index.html" class="hero-back">← All apps</a>
+    <div class="hero-badge">📁 File Manager</div>
+    <h1>Nebula<br>Files</h1>
+    <div class="hero-ver">v4.2.3 · GTK4 · Python · Open Source</div>
+    <p>A modern file manager for Linux with multiple themes, OneDrive &amp; Google Drive integration, split view, tabbed browsing, and customizable shortcuts.</p>
     <div class="hero-btns">
-      <a href="#downloads" class="btn-primary">Download</a>
-      <a href="https://github.com/VisorVP/nebula-files" target="_blank" class="btn-secondary">View Source</a>
+      <a href="#downloads" class="btn-p">↓ Download</a>
+      <a href="https://github.com/VisorVP/nebula-files" target="_blank" class="btn-o">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.268 2.75 1.026A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.026 2.747-1.026.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        View Source
+      </a>
     </div>
   </div>
-
-  <div class="hero-mockup">
-    <div class="mockup-bar">
-      <div class="dot r"></div>
-      <div class="dot y"></div>
-      <div class="dot g"></div>
-      <div class="mockup-title">NebulaFiles — Home</div>
-    </div>
-    <div class="mockup-body">
-      <div class="mockup-sidebar">
-        <div class="mockup-item active"><div class="mockup-dot"></div>Home</div>
-        <div class="mockup-item"><div class="mockup-dot"></div>Downloads</div>
-        <div class="mockup-item"><div class="mockup-dot"></div>Pictures</div>
-        <div class="mockup-item"><div class="mockup-dot"></div>Music</div>
-        <div class="mockup-item"><div class="mockup-dot"></div>Videos</div>
-        <div class="mockup-item"><div class="mockup-dot"></div>Games</div>
+  <div class="mockup">
+    <div class="mbar"><div class="md r"></div><div class="md y"></div><div class="md g"></div><div class="mtitle">Nebula Files — Home</div></div>
+    <div class="mbody">
+      <div class="msidebar">
+        <div class="mi a"><div class="mdot"></div>Home</div>
+        <div class="mi"><div class="mdot"></div>Downloads</div>
+        <div class="mi"><div class="mdot"></div>Pictures</div>
+        <div class="mi"><div class="mdot"></div>Music</div>
+        <div class="mi"><div class="mdot"></div>Videos</div>
+        <div class="mi"><div class="mdot"></div>☁ OneDrive</div>
+        <div class="mi"><div class="mdot"></div>☁ Drive</div>
       </div>
-      <div class="mockup-files">
-        <div class="mockup-file"><div class="mockup-file-icon" style="background:#f5a623">📁</div><div class="mockup-file-name">Documents</div></div>
-        <div class="mockup-file"><div class="mockup-file-icon" style="background:#f5a623">📁</div><div class="mockup-file-name">Downloads</div></div>
-        <div class="mockup-file"><div class="mockup-file-icon" style="background:#f5a623">📁</div><div class="mockup-file-name">Projects</div></div>
-        <div class="mockup-file"><div class="mockup-file-icon" style="background:#1a73e8">🖼</div><div class="mockup-file-name">wallpaper.png</div></div>
-        <div class="mockup-file"><div class="mockup-file-icon" style="background:#34a853">📄</div><div class="mockup-file-name">notes.md</div></div>
-        <div class="mockup-file"><div class="mockup-file-icon" style="background:#e91e63">⟨⟩</div><div class="mockup-file-name">main.py</div></div>
-        <div class="mockup-file"><div class="mockup-file-icon" style="background:#9c27b0">▶</div><div class="mockup-file-name">demo.mp4</div></div>
-        <div class="mockup-file"><div class="mockup-file-icon" style="background:#f5a623">📁</div><div class="mockup-file-name">Games</div></div>
+      <div class="mfiles">
+        <div class="mf"><div class="mfi" style="background:#f59e0b18">📁</div><div class="mfn">Documents</div></div>
+        <div class="mf"><div class="mfi" style="background:#f59e0b18">📁</div><div class="mfn">Downloads</div></div>
+        <div class="mf"><div class="mfi" style="background:#f59e0b18">📁</div><div class="mfn">Projects</div></div>
+        <div class="mf"><div class="mfi" style="background:#3b82f618">🖼</div><div class="mfn">wallpaper.png</div></div>
+        <div class="mf"><div class="mfi" style="background:#10b98118">📄</div><div class="mfn">notes.md</div></div>
+        <div class="mf"><div class="mfi" style="background:#ec489918">⟨⟩</div><div class="mfn">main.py</div></div>
+        <div class="mf"><div class="mfi" style="background:#8b5cf618">▶</div><div class="mfn">demo.mp4</div></div>
+        <div class="mf"><div class="mfi" style="background:#f59e0b18">📁</div><div class="mfn">Games</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="features" id="features">
-  <div class="section-header">
-    <h2>Everything you need</h2>
-    <p>Built from scratch with GTK4 and Python. No Electron, no bloat.</p>
-  </div>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">🎨</div>
-      <h3>Multiple Themes</h3>
-      <p>Switch between Windows 11, macOS, Nova, Minimal, and Retro themes. Each is a complete visual overhaul.</p>
+<section class="sec" id="features">
+  <div class="eyebrow">Features</div>
+  <div class="sec-title">Everything you need</div>
+  <div class="sec-sub">Built from scratch with GTK4 and Python. No Electron, no bloat.</div>
+  <div class="feat-grid">
+    <div class="fc">
+      <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div>
+      <h3>Multiple Themes</h3><p>Windows 11, macOS, Nova, Minimal, Retro. Each is an independent visual overhaul.</p>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">☁️</div>
-      <h3>Cloud Integration</h3>
-      <p>OneDrive and Google Drive appear in your sidebar. Browse and manage cloud files like local ones.</p>
+    <div class="fc">
+      <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg></div>
+      <h3>Cloud Integration</h3><p>OneDrive and Google Drive via rclone — browse cloud files like local ones.</p>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">📂</div>
-      <h3>Tabbed Browsing</h3>
-      <p>Open multiple folders in tabs, drag between them, and keep your workflow organized.</p>
+    <div class="fc">
+      <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h4l2-4h6l2 4h4v11H3z"/><path d="M3 9v11"/><path d="M21 9v11"/></svg></div>
+      <h3>Tabbed Browsing</h3><p>Multiple tabs, drag files between them, stay organized.</p>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">⚡</div>
-      <h3>Native Performance</h3>
-      <p>Built with GTK4 and libadwaita. Pure native speed with hardware-accelerated rendering.</p>
+    <div class="fc">
+      <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <h3>Native Performance</h3><p>GTK4 + libadwaita. Hardware-accelerated, no web technology overhead.</p>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔍</div>
-      <h3>Smart Search</h3>
-      <p>Search files instantly. Filter by type, sort by date or size, navigate with breadcrumb paths.</p>
+    <div class="fc">
+      <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+      <h3>Smart Search</h3><p>Filter by type, sort by date or size, breadcrumb navigation.</p>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">🪟</div>
-      <h3>Windows 11 Theme</h3>
-      <p>Authentic Win11 Explorer experience on Linux — icons, sidebar, toolbar all match the real thing.</p>
+    <div class="fc">
+      <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M10 14h4"/></svg></div>
+      <h3>Keyboard Shortcuts</h3><p>Fully customizable shortcuts for power users.</p>
     </div>
   </div>
 </section>
 
-<section class="downloads" id="downloads">
-  <div class="section-header">
-    <h2>Get Nebula Files</h2>
-    <p>Free and open source. Available for Linux.</p>
-  </div>
-  <div class="downloads-grid">
-    <div class="download-card">
-      <div class="download-icon">📦</div>
-      <h3>Flatpak</h3>
-      <p>All Linux distros</p>
-      <a href="https://github.com/VisorVP/nebula-files/releases" target="_blank" class="download-btn available">Download</a>
+<section class="sec" id="downloads">
+  <div class="eyebrow">Downloads</div>
+  <div class="sec-title">Get Nebula Files</div>
+  <div class="sec-sub">Free and open source. Pick your format below.</div>
+  <div class="dl-list">
+    <div class="dl-row">
+      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3L3 8l9 5 9-5-9-5zM3 16l9 5 9-5M3 12l9 5 9-5" stroke="#4A90D9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="dl-info">
+        <h3>Flatpak <span class="badge b-ok">Available</span></h3>
+        <p>Universal — all Linux distros with Flatpak</p>
+        <div class="dl-cmd" id="c1"><span>flatpak install flathub org.nebulaprojects.files</span><button class="cp" onclick="cp('c1')">⧉</button></div>
+      </div>
+      <div class="dl-acts"><a href="https://github.com/VisorVP/nebula-files/releases" target="_blank" class="dl-btn av">↓ Download</a></div>
     </div>
-    <div class="download-card">
-      <div class="download-icon">📐</div>
-      <h3>AppImage</h3>
-      <p>Universal Linux</p>
-      <a href="https://github.com/VisorVP/nebula-files/releases" target="_blank" class="download-btn available">Download</a>
+    <div class="dl-row">
+      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#f97316" stroke-width="1.8"/><path d="M8 16l4-8 4 8M9.5 13h5" stroke="#f97316" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div class="dl-info">
+        <h3>AppImage <span class="badge b-ok">Available</span></h3>
+        <p>Portable — no installation, just download and run</p>
+        <div class="dl-cmd" id="c2"><span>chmod +x NebulaTiles-*.AppImage && ./NebulaTiles-*.AppImage</span><button class="cp" onclick="cp('c2')">⧉</button></div>
+      </div>
+      <div class="dl-acts"><a href="https://github.com/VisorVP/nebula-files/releases" target="_blank" class="dl-btn av">↓ Download</a></div>
     </div>
-    <div class="download-card">
-      <div class="download-icon">🐧</div>
-      <h3>Debian / Ubuntu</h3>
-      <p>.deb package</p>
-      <a href="https://github.com/VisorVP/nebula-files/releases" target="_blank" class="download-btn available">Download</a>
+    <div class="dl-row">
+      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="#A81D33"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zm0 13.5c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08s5.97 1.09 6 3.08c-1.29 1.94-3.5 3.22-6 3.22z"/></svg></div>
+      <div class="dl-info">
+        <h3>Debian / Ubuntu <span class="badge b-ok">Available</span></h3>
+        <p>For Ubuntu, Debian, AnduinOS and all .deb-based distros</p>
+        <div class="dl-cmd" id="c3"><span>sudo dpkg -i nebula-files_*.deb && sudo apt-get install -f</span><button class="cp" onclick="cp('c3')">⧉</button></div>
+      </div>
+      <div class="dl-acts"><a href="https://github.com/VisorVP/nebula-files/releases" target="_blank" class="dl-btn av">↓ Download</a></div>
     </div>
-    <div class="download-card">
-      <div class="download-icon">🎩</div>
-      <h3>Fedora / RHEL</h3>
-      <p>.rpm package</p>
-      <span class="download-btn soon">Coming Soon</span>
+    <div class="dl-row soon">
+      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6c-2 0-3.77-.98-4.87-2.5" stroke="#51A2DA" stroke-width="1.8" stroke-linecap="round"/><path d="M12 12c0 3.31-2.69 6-6 6S0 15.31 0 12s2.69-6 6-6c2 0 3.77.98 4.87 2.5" stroke="#51A2DA" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div class="dl-info">
+        <h3>Fedora / RHEL <span class="badge b-soon">Coming Soon</span></h3>
+        <p>For Fedora, RHEL, Bazzite and all .rpm-based distros</p>
+        <div class="dl-cmd" id="c4"><span>sudo dnf install nebula-files-*.rpm</span><button class="cp" onclick="cp('c4')">⧉</button></div>
+      </div>
+      <div class="dl-acts"><span class="dl-btn na">Coming Soon</span></div>
     </div>
-    <div class="download-card">
-      <div class="download-icon">🏪</div>
-      <h3>Flathub</h3>
-      <p>Coming to Flathub</p>
-      <span class="download-btn soon">Coming Soon</span>
+    <div class="dl-row soon">
+      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/></svg></div>
+      <div class="dl-info">
+        <h3>Flathub <span class="badge b-pend">Pending Review</span></h3>
+        <p>Official Flathub store listing — submission under review</p>
+        <div class="dl-cmd" id="c5"><span>flatpak install flathub org.nebulaprojects.files</span><button class="cp" onclick="cp('c5')">⧉</button></div>
+      </div>
+      <div class="dl-acts"><span class="dl-btn na">Pending</span></div>
     </div>
   </div>
 </section>
+</main>
 
 <footer>
-  Made with care by <a href="https://github.com/VisorVP" target="_blank">Nebula Projects</a> · 
-  <a href="https://github.com/VisorVP/nebula-files" target="_blank">GitHub</a>
+  Made with care by <a href="https://github.com/VisorVP" target="_blank">Nebula Projects</a> ·
+  <a href="https://github.com/VisorVP/nebula-files" target="_blank">GitHub</a> ·
+  <a href="index.html">All Apps</a>
 </footer>
 
+<div class="theme-pill" id="themePill">
+  <div class="pill-inner" id="pillInner">
+    <button class="pill-btn active" id="pillDark" onclick="setPillTheme('dark')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
+      Dark
+    </button>
+    <div class="pill-sep"></div>
+    <button class="pill-btn" id="pillLight" onclick="setPillTheme('light')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      Light
+    </button>
+    <div class="pill-sep"></div>
+  </div>
+  <button class="pill-collapse" id="pillCollapse" onclick="togglePill()" title="Hide/Show">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+</div>
+
+<script>
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let stars = [], animEnabled = true, animId;
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 200; i++) {
+    stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+      r: Math.random()*1.3+0.2, speed: Math.random()*0.12+0.02,
+      opacity: Math.random()*0.7+0.1, twinkleSpeed: Math.random()*0.02+0.005,
+      twinklePhase: Math.random()*Math.PI*2, isTeal: Math.random()>0.6 });
+  }
+}
+function loop() {
+  if (!animEnabled) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s => {
+    s.twinklePhase += s.twinkleSpeed;
+    const op = s.opacity*(0.5+0.5*Math.sin(s.twinklePhase));
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle = s.isTeal ? `rgba(34,211,238,${op})` : `rgba(147,197,253,${op})`;
+    ctx.fill(); s.y += s.speed;
+    if (s.y > canvas.height) { s.y=0; s.x=Math.random()*canvas.width; }
+  });
+  animId = requestAnimationFrame(loop);
+}
+resize(); initStars(); loop();
+window.addEventListener('resize', () => { resize(); initStars(); });
+function togglePill() {
+  const inner = document.getElementById('pillInner');
+  const btn = document.getElementById('pillCollapse');
+  const collapsed = inner.classList.toggle('hidden');
+  btn.classList.toggle('collapsed', collapsed);
+  localStorage.setItem('nb-pill', collapsed ? '0' : '1');
+}
+function toggleSettings() { document.getElementById('sp').classList.toggle('open'); }
+document.addEventListener('click', e => { if (!e.target.closest('.settings-wrap')) document.getElementById('sp').classList.remove('open'); });
+function setTheme(cb) { setPillTheme(cb.checked ? 'dark' : 'light'); }
+function setPillTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('nb-theme', t);
+  document.getElementById('darkT').checked = t === 'dark';
+  document.getElementById('pillDark').classList.toggle('active', t === 'dark');
+  document.getElementById('pillLight').classList.toggle('active', t === 'light');
+}
+function showCmds(cb) { document.querySelectorAll('.dl-cmd').forEach(el => el.style.display = cb.checked ? 'flex' : 'none'); }
+function toggleAnim(cb) {
+  animEnabled = cb.checked;
+  if (animEnabled) loop(); else { cancelAnimationFrame(animId); ctx.clearRect(0,0,canvas.width,canvas.height); }
+  localStorage.setItem('nb-anim', cb.checked ? '1' : '0');
+}
+function cp(id) {
+  const txt = document.getElementById(id).querySelector('span').textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.getElementById(id).querySelector('.cp');
+    btn.textContent = '✓'; setTimeout(() => btn.textContent = '⧉', 1500);
+  });
+}
+(function(){
+  const t = localStorage.getItem('nb-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('darkT').checked = t === 'dark';
+  document.getElementById('pillDark').classList.toggle('active', t === 'dark');
+  document.getElementById('pillLight').classList.toggle('active', t === 'light');
+  if (localStorage.getItem('nb-anim') === '0') { document.getElementById('animT').checked = false; toggleAnim({checked:false}); }
+})();
+</script>
 </body>
 </html>
