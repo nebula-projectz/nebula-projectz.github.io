@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nebula Files — A file manager from the future</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg width='256' height='256' viewBox='0 0 120 120' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='30%25' cy='30%25' r='80%25'%3E%3Cstop offset='0%25' stop-color='%230f2040'/%3E%3Cstop offset='100%25' stop-color='%23020810'/%3E%3C/radialGradient%3E%3ClinearGradient id='f' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2322d3ee'/%3E%3Cstop offset='50%25' stop-color='%2306b6d4'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='120' height='120' rx='26' fill='url(%23bg)'/%3E%3Cpath d='M18 54 C18 48 22 44 28 44 L49 44 L56 36 L92 36 C98 36 102 40 102 46 L102 84 C102 90 98 94 92 94 L28 94 C22 94 18 90 18 84 Z' fill='url(%23f)'/%3E%3Cpath d='M28 44 L49 44 L56 36 L28 36 Z' fill='%230891b2'/%3E%3Crect x='28' y='62' width='16' height='20' rx='3' fill='white' opacity='0.25'/%3E%3Crect x='48' y='62' width='16' height='20' rx='3' fill='white' opacity='0.2'/%3E%3Crect x='68' y='62' width='16' height='20' rx='3' fill='white' opacity='0.15'/%3E%3Crect x='88' y='62' width='8' height='20' rx='3' fill='white' opacity='0.1'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -62,8 +63,10 @@ nav { position:fixed; top:0; left:0; right:0; z-index:200; height:58px; padding:
   background:color-mix(in srgb,var(--bg) 60%,transparent);
   backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-bottom:1px solid var(--border); }
 .nav-left { display:flex; align-items:center; gap:20px; }
-.nav-logo { font-family:'Space Mono',monospace; font-weight:700; font-size:15px;
-  background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; }
+.nav-logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
+.nav-logo-icon { width:28px; height:28px; border-radius:7px; flex-shrink:0; }
+.nav-logo-text { font-family:'Space Mono',monospace; font-weight:700; font-size:15px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 .nav-sep { color:var(--text3); }
 .nav-page { font-size:13px; color:var(--text2); font-weight:500; }
 .nav-right { display:flex; align-items:center; gap:6px; }
@@ -176,10 +179,43 @@ nav { position:fixed; top:0; left:0; right:0; z-index:200; height:58px; padding:
 .badge { font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; padding:2px 8px; border-radius:4px; }
 .b-ok { background:rgba(16,185,129,.15); color:var(--success); border:1px solid rgba(16,185,129,.25); }
 .b-soon { background:rgba(245,158,11,.15); color:var(--warning); border:1px solid rgba(245,158,11,.25); }
-.b-pend { background:rgba(6,182,212,.15); color:var(--accent); border:1px solid rgba(6,182,212,.25); }
+.b-future { background:rgba(139,92,246,.15); color:#a78bfa; border:1px solid rgba(139,92,246,.25); }
 
 footer { border-top:1px solid var(--border); padding:28px 48px; text-align:center; color:var(--text3); font-size:12px; position:relative; z-index:1; margin-top:32px; }
 footer a { color:var(--accent); text-decoration:none; }
+
+/* SCREENSHOTS */
+.media-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:40px; }
+.media-shot { border-radius:12px; overflow:hidden; border:1px solid var(--border); box-shadow:0 8px 30px rgba(0,0,0,0.5); background:var(--surface); transition:all .2s; cursor:pointer; }
+.media-shot:hover { border-color:rgba(6,182,212,0.4); transform:translateY(-2px); box-shadow:0 12px 40px rgba(6,182,212,0.12); }
+.shot-bar { background:rgba(2,8,18,0.9); padding:8px 12px; display:flex; align-items:center; gap:7px; border-bottom:1px solid rgba(6,182,212,0.12); }
+.shot-dots { display:flex; gap:4px; }
+.shot-dot { width:9px; height:9px; border-radius:50%; }
+.shot-title { flex:1; text-align:center; font-size:9px; font-family:'Space Mono',monospace; color:var(--text3); }
+.shot-body { padding:0; display:flex; height:180px; }
+.shot-sidebar { width:110px; background:rgba(2,8,20,0.85); padding:8px 5px; border-right:1px solid rgba(6,182,212,0.1); display:flex; flex-direction:column; gap:2px; flex-shrink:0; }
+.shot-item { font-size:9px; color:var(--text3); padding:5px 8px; border-radius:5px; display:flex; align-items:center; gap:5px; }
+.shot-item.a { background:rgba(6,182,212,0.18); color:var(--accent); }
+.shot-dot2 { width:6px; height:6px; border-radius:50%; background:currentColor; opacity:0.5; flex-shrink:0; }
+.shot-item.a .shot-dot2 { opacity:1; }
+.shot-main { flex:1; background:rgba(1,5,14,0.75); padding:10px; display:grid; grid-template-columns:repeat(4,1fr); gap:7px; align-content:start; }
+.shot-file { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.shot-fi { width:32px; height:32px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:13px; }
+.shot-fn { font-size:7px; color:var(--text3); text-align:center; overflow:hidden; max-width:100%; white-space:nowrap; text-overflow:ellipsis; }
+[data-theme="light"] .shot-bar { background:rgba(240,249,255,0.9); }
+[data-theme="light"] .shot-sidebar { background:rgba(210,240,255,0.7); }
+[data-theme="light"] .shot-main { background:rgba(190,230,255,0.4); }
+
+/* WIN11 SHOT */
+.shot-body.win11 { height:180px; }
+.shot-sidebar.win11 { background:rgba(32,32,40,0.92); }
+.shot-main.win11 { background:rgba(28,28,36,0.85); }
+
+.video-wrap { position:relative; border-radius:14px; overflow:hidden; border:1px solid var(--border); box-shadow:0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(6,182,212,0.08); aspect-ratio:16/9; background:#000; }
+.video-wrap iframe { width:100%; height:100%; border:none; display:block; }
+.video-label { font-size:11px; color:var(--text3); text-align:center; margin-top:10px; font-family:'Space Mono',monospace; }
+.media-layout { display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start; }
+@media(max-width:800px){ .media-grid{grid-template-columns:1fr;} .media-layout{grid-template-columns:1fr;} }
 
 /* THEME SWITCHER PILL */
 .theme-pill {
@@ -238,12 +274,16 @@ footer a { color:var(--accent); text-decoration:none; }
 
 <nav>
   <div class="nav-left">
-    <a href="index.html" class="nav-logo">NEBULA</a>
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="nlbg" cx="30%" cy="30%" r="80%"><stop offset="0%" stop-color="#0f2040"/><stop offset="100%" stop-color="#020810"/></radialGradient><linearGradient id="nlf" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22d3ee"/><stop offset="50%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#2563eb"/></linearGradient></defs><rect width="120" height="120" rx="26" fill="url(#nlbg)"/><circle cx="95" cy="15" r="1.2" fill="white" opacity="0.5"/><circle cx="18" cy="20" r="1" fill="white" opacity="0.6"/><path d="M18 54 C18 48 22 44 28 44 L49 44 L56 36 L92 36 C98 36 102 40 102 46 L102 84 C102 90 98 94 92 94 L28 94 C22 94 18 90 18 84 Z" fill="url(#nlf)"/><path d="M28 44 L49 44 L56 36 L28 36 Z" fill="#0891b2"/><rect x="28" y="62" width="16" height="20" rx="3" fill="white" opacity="0.25"/><rect x="48" y="62" width="16" height="20" rx="3" fill="white" opacity="0.2"/><rect x="68" y="62" width="16" height="20" rx="3" fill="white" opacity="0.15"/><rect x="88" y="62" width="8" height="20" rx="3" fill="white" opacity="0.1"/></svg>
+      <span class="nav-logo-text">NEBULA</span>
+    </a>
     <span class="nav-sep">/</span>
     <span class="nav-page">Nebula Files</span>
   </div>
   <div class="nav-right">
     <a href="#features" class="nav-link">Features</a>
+    <a href="#screenshots" class="nav-link">Screenshots</a>
     <a href="#downloads" class="nav-link">Downloads</a>
     <a href="https://github.com/VisorVP/nebula-files" target="_blank" class="nav-link">GitHub</a>
     <div class="settings-wrap">
@@ -272,7 +312,29 @@ footer a { color:var(--accent); text-decoration:none; }
   <div>
     <a href="index.html" class="hero-back">← All apps</a>
     <div class="hero-badge">📁 File Manager</div>
-    <h1>Nebula<br>Files</h1>
+    <div style="display:flex;justify-content:center;margin-bottom:24px;">
+        <svg width="96" height="96" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="hlbg" cx="30%" cy="30%" r="80%"><stop offset="0%" stop-color="#0f2040"/><stop offset="100%" stop-color="#020810"/></radialGradient>
+            <linearGradient id="hlf" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22d3ee"/><stop offset="50%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#2563eb"/></linearGradient>
+            <filter id="hlglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#hlbg)"/>
+          <circle cx="18" cy="20" r="1" fill="white" opacity="0.6"/>
+          <circle cx="95" cy="15" r="1.2" fill="white" opacity="0.5"/>
+          <circle cx="105" cy="45" r="0.8" fill="#22d3ee" opacity="0.7"/>
+          <circle cx="15" cy="90" r="1" fill="white" opacity="0.4"/>
+          <circle cx="100" cy="100" r="0.9" fill="#93c5fd" opacity="0.5"/>
+          <path d="M18 54 C18 48 22 44 28 44 L49 44 L56 36 L92 36 C98 36 102 40 102 46 L102 84 C102 90 98 94 92 94 L28 94 C22 94 18 90 18 84 Z" fill="url(#hlf)" filter="url(#hlglow)"/>
+          <path d="M28 44 L49 44 L56 36 L28 36 Z" fill="#0891b2"/>
+          <path d="M18 54 C18 48 22 44 28 44 L49 44 L56 36 L92 36 C98 36 102 40 102 46 L102 62 C60 62 18 60 18 54 Z" fill="white" opacity="0.06"/>
+          <rect x="28" y="62" width="16" height="20" rx="3" fill="white" opacity="0.25"/>
+          <rect x="48" y="62" width="16" height="20" rx="3" fill="white" opacity="0.2"/>
+          <rect x="68" y="62" width="16" height="20" rx="3" fill="white" opacity="0.15"/>
+          <rect x="88" y="62" width="8" height="20" rx="3" fill="white" opacity="0.1"/>
+        </svg>
+      </div>
+      <h1>Nebula<br>Files</h1>
     <div class="hero-ver">v4.2.3 · GTK4 · Python · Open Source</div>
     <p>A modern file manager for Linux with multiple themes, OneDrive &amp; Google Drive integration, split view, tabbed browsing, and customizable shortcuts.</p>
     <div class="hero-btns">
@@ -347,6 +409,145 @@ footer a { color:var(--accent); text-decoration:none; }
   </div>
 </section>
 
+<section class="sec" id="screenshots">
+  <div class="eyebrow">Media</div>
+  <div class="sec-title">Screenshots & Video</div>
+  <div class="sec-sub">See Nebula Files in action — multiple themes, cloud integration and more.</div>
+
+  <div class="media-layout">
+    <!-- Screenshots grid -->
+    <div>
+      <div class="media-grid">
+
+        <!-- Nova Theme -->
+        <div class="media-shot">
+          <div class="shot-bar">
+            <div class="shot-dots"><div class="shot-dot" style="background:#ff5f57"></div><div class="shot-dot" style="background:#febc2e"></div><div class="shot-dot" style="background:#28c840"></div></div>
+            <div class="shot-title">Nova Theme — Home</div>
+          </div>
+          <div class="shot-body">
+            <div class="shot-sidebar">
+              <div class="shot-item a"><div class="shot-dot2"></div>🏠 Home</div>
+              <div class="shot-item"><div class="shot-dot2"></div>⬇ Downloads</div>
+              <div class="shot-item"><div class="shot-dot2"></div>🖼 Pictures</div>
+              <div class="shot-item"><div class="shot-dot2"></div>🎵 Music</div>
+              <div class="shot-item"><div class="shot-dot2"></div>☁ OneDrive</div>
+              <div class="shot-item"><div class="shot-dot2"></div>☁ Drive</div>
+            </div>
+            <div class="shot-main">
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(6,182,212,0.15)">📁</div><div class="shot-fn">Documents</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(6,182,212,0.15)">📁</div><div class="shot-fn">Downloads</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(59,130,246,0.15)">🖼</div><div class="shot-fn">photo.png</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(16,185,129,0.15)">📄</div><div class="shot-fn">notes.md</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(236,72,153,0.15)">⟨⟩</div><div class="shot-fn">main.py</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(139,92,246,0.15)">▶</div><div class="shot-fn">demo.mp4</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(6,182,212,0.15)">📁</div><div class="shot-fn">Projects</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(245,158,11,0.15)">🎮</div><div class="shot-fn">Games</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Windows 11 Theme -->
+        <div class="media-shot">
+          <div class="shot-bar" style="background:rgba(32,32,40,0.95)">
+            <div class="shot-dots"><div class="shot-dot" style="background:#ff5f57"></div><div class="shot-dot" style="background:#febc2e"></div><div class="shot-dot" style="background:#28c840"></div></div>
+            <div class="shot-title" style="color:rgba(255,255,255,0.5)">Windows 11 Theme — Home</div>
+          </div>
+          <div class="shot-body">
+            <div class="shot-sidebar" style="background:rgba(32,32,42,0.95)">
+              <div class="shot-item a" style="background:rgba(0,120,212,0.25);color:#60a5fa"><div class="shot-dot2"></div>🏠 Home</div>
+              <div class="shot-item" style="color:rgba(255,255,255,0.5)"><div class="shot-dot2"></div>⬇ Downloads</div>
+              <div class="shot-item" style="color:rgba(255,255,255,0.5)"><div class="shot-dot2"></div>🖼 Pictures</div>
+              <div class="shot-item" style="color:rgba(255,255,255,0.5)"><div class="shot-dot2"></div>☁ OneDrive</div>
+            </div>
+            <div class="shot-main" style="background:rgba(28,28,36,0.9)">
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(255,196,0,0.2)">📁</div><div class="shot-fn" style="color:rgba(255,255,255,0.6)">Documents</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(255,196,0,0.2)">📁</div><div class="shot-fn" style="color:rgba(255,255,255,0.6)">Downloads</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(0,120,212,0.2)">🖼</div><div class="shot-fn" style="color:rgba(255,255,255,0.6)">photo.png</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(52,199,89,0.2)">📄</div><div class="shot-fn" style="color:rgba(255,255,255,0.6)">notes.md</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(255,59,48,0.2)">⟨⟩</div><div class="shot-fn" style="color:rgba(255,255,255,0.6)">main.py</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(139,92,246,0.2)">▶</div><div class="shot-fn" style="color:rgba(255,255,255,0.6)">demo.mp4</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cloud Integration -->
+        <div class="media-shot">
+          <div class="shot-bar">
+            <div class="shot-dots"><div class="shot-dot" style="background:#ff5f57"></div><div class="shot-dot" style="background:#febc2e"></div><div class="shot-dot" style="background:#28c840"></div></div>
+            <div class="shot-title">Cloud Integration — OneDrive</div>
+          </div>
+          <div class="shot-body">
+            <div class="shot-sidebar">
+              <div class="shot-item"><div class="shot-dot2"></div>🏠 Home</div>
+              <div class="shot-item"><div class="shot-dot2"></div>📁 Documents</div>
+              <div class="shot-item a"><div class="shot-dot2"></div>☁ OneDrive</div>
+              <div class="shot-item"><div class="shot-dot2"></div>☁ Drive</div>
+            </div>
+            <div class="shot-main">
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(0,120,212,0.15)">📁</div><div class="shot-fn">Work</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(0,120,212,0.15)">📁</div><div class="shot-fn">Photos</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(59,130,246,0.15)">📄</div><div class="shot-fn">resume.docx</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(16,185,129,0.15)">📄</div><div class="shot-fn">budget.xlsx</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(6,182,212,0.15)">📁</div><div class="shot-fn">Backups</div></div>
+              <div class="shot-file"><div class="shot-fi" style="background:rgba(139,92,246,0.15)">▶</div><div class="shot-fn">clip.mp4</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabbed browsing -->
+        <div class="media-shot">
+          <div class="shot-bar">
+            <div class="shot-dots"><div class="shot-dot" style="background:#ff5f57"></div><div class="shot-dot" style="background:#febc2e"></div><div class="shot-dot" style="background:#28c840"></div></div>
+            <div class="shot-title">Tabbed Browsing — Split View</div>
+          </div>
+          <div class="shot-body" style="flex-direction:column">
+            <!-- Tab bar -->
+            <div style="background:rgba(6,182,212,0.07);border-bottom:1px solid rgba(6,182,212,0.12);padding:4px 8px;display:flex;gap:4px;">
+              <div style="background:rgba(6,182,212,0.2);border-radius:4px;padding:3px 10px;font-size:8px;color:var(--accent);font-family:'Space Mono',monospace;">🏠 Home</div>
+              <div style="border-radius:4px;padding:3px 10px;font-size:8px;color:var(--text3);font-family:'Space Mono',monospace;">📁 Projects</div>
+              <div style="border-radius:4px;padding:3px 10px;font-size:8px;color:var(--text3);font-family:'Space Mono',monospace;">⬇ Downloads</div>
+              <div style="padding:3px 6px;font-size:10px;color:var(--text3);">+</div>
+            </div>
+            <div style="flex:1;display:flex;">
+              <div style="width:90px;background:rgba(2,8,20,0.85);padding:6px 4px;border-right:1px solid rgba(6,182,212,0.1)">
+                <div class="shot-item a" style="font-size:8px"><div class="shot-dot2"></div>Home</div>
+                <div class="shot-item" style="font-size:8px"><div class="shot-dot2"></div>Downloads</div>
+                <div class="shot-item" style="font-size:8px"><div class="shot-dot2"></div>Pictures</div>
+              </div>
+              <div style="flex:1;background:rgba(1,5,14,0.75);padding:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;align-content:start">
+                <div class="shot-file"><div class="shot-fi" style="background:rgba(6,182,212,0.15);width:28px;height:28px">📁</div><div class="shot-fn">Docs</div></div>
+                <div class="shot-file"><div class="shot-fi" style="background:rgba(6,182,212,0.15);width:28px;height:28px">📁</div><div class="shot-fn">Music</div></div>
+                <div class="shot-file"><div class="shot-fi" style="background:rgba(59,130,246,0.15);width:28px;height:28px">🖼</div><div class="shot-fn">wall.png</div></div>
+                <div class="shot-file"><div class="shot-fi" style="background:rgba(16,185,129,0.15);width:28px;height:28px">📄</div><div class="shot-fn">README</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- YouTube video -->
+    <div>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/jgXrFlac8fk" title="Nebula Files Demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="video-label">▶ Nebula Files — Feature Demo Video</div>
+      <div style="margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">Themes Available</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;">
+          <span style="font-size:11px;padding:3px 10px;border-radius:5px;background:rgba(6,182,212,0.1);color:var(--accent);border:1px solid rgba(6,182,212,0.2)">Nova</span>
+          <span style="font-size:11px;padding:3px 10px;border-radius:5px;background:rgba(0,120,212,0.1);color:#60a5fa;border:1px solid rgba(0,120,212,0.2)">Windows 11</span>
+          <span style="font-size:11px;padding:3px 10px;border-radius:5px;background:rgba(255,255,255,0.06);color:var(--text2);border:1px solid var(--border)">macOS</span>
+          <span style="font-size:11px;padding:3px 10px;border-radius:5px;background:rgba(255,255,255,0.04);color:var(--text3);border:1px solid var(--border)">Minimal</span>
+          <span style="font-size:11px;padding:3px 10px;border-radius:5px;background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2)">Retro</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="sec" id="downloads">
   <div class="eyebrow">Downloads</div>
   <div class="sec-title">Get Nebula Files</div>
@@ -388,7 +589,6 @@ footer a { color:var(--accent); text-decoration:none; }
       <div class="dl-info">
         <h3>Fedora / RHEL <span class="badge b-soon">Coming Soon</span></h3>
         <p>For Fedora, RHEL, Bazzite and all .rpm-based distros</p>
-        <div class="dl-cmd" id="c4"><span>sudo dnf install nebula-files-*.rpm</span><button class="cp" onclick="cp('c4')">⧉</button></div>
       </div>
       <div class="dl-acts"><span class="dl-btn na">Coming Soon</span></div>
     </div>
@@ -396,11 +596,19 @@ footer a { color:var(--accent); text-decoration:none; }
     <div class="dl-row soon">
       <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/></svg></div>
       <div class="dl-info">
-        <h3>Flathub <span class="badge b-pend">Pending Review</span></h3>
-        <p>Official Flathub store listing — submission under review</p>
-        <div class="dl-cmd" id="c5"><span>flatpak install flathub org.nebulaprojects.files</span><button class="cp" onclick="cp('c5')">⧉</button></div>
+        <h3>Flatpak <span class="badge b-future">May Come in Future</span></h3>
+        <p>Universal Flatpak build — not available yet</p>
       </div>
-      <div class="dl-acts"><span class="dl-btn na">Pending</span></div>
+      <div class="dl-acts"><span class="dl-btn na">Not Available</span></div>
+    </div>
+
+    <div class="dl-row soon">
+      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="#06b6d4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke="#06b6d4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="dl-info">
+        <h3>Flathub <span class="badge b-future">May Come in Future</span></h3>
+        <p>Official Flathub store listing — not available yet</p>
+      </div>
+      <div class="dl-acts"><span class="dl-btn na">Not Available</span></div>
     </div>
 
   </div>
