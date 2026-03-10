@@ -56,6 +56,7 @@ body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; 
 @keyframes bm2 { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(-100px,-60px) scale(1.15);} 66%{transform:translate(80px,-120px) scale(0.95);} }
 @keyframes bm3 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-80px,60px) scale(1.2);} }
 
+/* NAV */
 nav { position:fixed; top:0; left:0; right:0; z-index:200; height:58px; padding:0 48px;
   display:flex; align-items:center; justify-content:space-between;
   background:color-mix(in srgb,var(--bg) 60%,transparent);
@@ -87,6 +88,7 @@ nav { position:fixed; top:0; left:0; right:0; z-index:200; height:58px; padding:
 .toggle-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:white; transition:transform .2s; box-shadow:0 1px 3px rgba(0,0,0,.3); }
 .toggle input:checked ~ .toggle-thumb { transform:translateX(18px); }
 
+/* HERO */
 .hero { padding:100px 48px 70px; max-width:1100px; margin:0 auto;
   display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; position:relative; }
 .hero-back { display:inline-flex; align-items:center; gap:5px; color:var(--text3); text-decoration:none;
@@ -109,13 +111,14 @@ nav { position:fixed; top:0; left:0; right:0; z-index:200; height:58px; padding:
   font-size:13px; font-weight:600; border:1px solid var(--border2); transition:all .2s; display:inline-flex; align-items:center; gap:7px; }
 .btn-o:hover { border-color:var(--accent); color:var(--accent); }
 
+/* MOCKUP */
 .mockup { position:relative; z-index:3; border-radius:14px; overflow:hidden;
   box-shadow:0 0 0 1px rgba(6,182,212,0.25), 0 30px 80px rgba(0,0,0,0.6), 0 0 60px rgba(6,182,212,0.06);
   backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px); background:transparent; }
 .mbar { background:rgba(2,8,18,0.88); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
   padding:9px 14px; display:flex; align-items:center; gap:7px; border-bottom:1px solid rgba(6,182,212,0.15); }
 [data-theme="light"] .mockup { box-shadow:0 0 0 1px rgba(6,182,212,0.3), 0 30px 80px rgba(0,0,0,0.2); }
-[data-theme="light"] .mbar { background:rgba(255,255,255,0.7); }
+[data-theme="light"] .mbar { background:rgba(255,255,255,0.7); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
 .md { width:10px; height:10px; border-radius:50%; }
 .md.r{background:#ff5f57;} .md.y{background:#febc2e;} .md.g{background:#28c840;}
 .mtitle { flex:1; text-align:center; font-size:10px; color:var(--text3); font-family:'Space Mono',monospace; }
@@ -123,7 +126,7 @@ nav { position:fixed; top:0; left:0; right:0; z-index:200; height:58px; padding:
 .msidebar { width:140px; background:rgba(2,8,20,0.82); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
   padding:10px 6px; border-right:1px solid rgba(6,182,212,0.12); }
 [data-theme="light"] .msidebar { background:rgba(200,230,255,0.65); }
-.mi { padding:6px 10px; border-radius:6px; color:var(--text3); font-size:10px; display:flex; align-items:center; gap:7px; margin-bottom:2px; }
+.mi { padding:6px 10px; border-radius:6px; color:var(--text3); font-size:10px; display:flex; align-items:center; gap:7px; margin-bottom:2px; transition:all .15s; }
 .mi.a { background:rgba(6,182,212,0.2); color:var(--accent); }
 .mdot { width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.4; flex-shrink:0; }
 .mi.a .mdot { opacity:1; }
@@ -131,20 +134,24 @@ nav { position:fixed; top:0; left:0; right:0; z-index:200; height:58px; padding:
   background:rgba(1,5,14,0.72); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%); }
 [data-theme="light"] .mfiles { background:rgba(180,220,255,0.4); }
 .mf { display:flex; flex-direction:column; align-items:center; gap:5px; }
-.mfi { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.mfi { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
 .mfn { font-size:8px; color:var(--text3); text-align:center; }
 
-.sec { padding:64px 48px; max-width:1100px; margin:0 auto; position:relative; }
+/* SECTIONS */
+.sec { padding:64px 48px; max-width:1100px; margin:0 auto; position:relative; isolation:auto; }
 .eyebrow { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:8px; font-weight:700; }
 .sec-title { font-family:'Space Mono',monospace; font-weight:700; font-size:clamp(20px,3vw,30px); letter-spacing:-1px; margin-bottom:8px; color:var(--text); }
 .sec-sub { font-size:15px; color:var(--text2); line-height:1.6; margin-bottom:40px; }
 
+/* FEATURES */
 .feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
 .fc { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px; transition:all .2s; backdrop-filter:blur(40px); -webkit-backdrop-filter:blur(40px); }
 .fc:hover { border-color:rgba(6,182,212,0.38); transform:translateY(-2px); box-shadow:0 8px 30px rgba(6,182,212,0.1); background:var(--surface2); }
+.fi { font-size:22px; margin-bottom:10px; }
 .fc h3 { font-size:13px; font-weight:600; margin-bottom:5px; color:var(--text); }
 .fc p { font-size:12px; color:var(--text2); line-height:1.6; }
 
+/* DOWNLOADS */
 .dl-list { display:flex; flex-direction:column; gap:10px; }
 .dl-row { background:var(--surface); border:1px solid var(--border);
   border-radius:12px; padding:18px 22px;
@@ -169,36 +176,48 @@ nav { position:fixed; top:0; left:0; right:0; z-index:200; height:58px; padding:
 .badge { font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; padding:2px 8px; border-radius:4px; }
 .b-ok { background:rgba(16,185,129,.15); color:var(--success); border:1px solid rgba(16,185,129,.25); }
 .b-soon { background:rgba(245,158,11,.15); color:var(--warning); border:1px solid rgba(245,158,11,.25); }
-
-.fi { width:40px; height:40px; border-radius:10px; background:rgba(6,182,212,0.1);
-  border:1px solid rgba(6,182,212,0.18); display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
-.fi svg { width:20px; height:20px; }
+.b-pend { background:rgba(6,182,212,.15); color:var(--accent); border:1px solid rgba(6,182,212,.25); }
 
 footer { border-top:1px solid var(--border); padding:28px 48px; text-align:center; color:var(--text3); font-size:12px; position:relative; z-index:1; margin-top:32px; }
 footer a { color:var(--accent); text-decoration:none; }
 
-.theme-pill { position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+/* THEME SWITCHER PILL */
+.theme-pill {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
   z-index:500; display:flex; align-items:center; gap:2px;
   background:color-mix(in srgb,var(--surface) 70%,transparent);
   backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
   border:1px solid var(--border2); border-radius:50px;
-  padding:5px; box-shadow:0 8px 32px rgba(0,0,0,0.4); transition:all .3s; }
-.theme-pill:hover { box-shadow:0 12px 40px rgba(6,182,212,0.2); }
-.pill-btn { display:flex; align-items:center; gap:7px; padding:7px 16px; border-radius:40px;
+  padding:5px; box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  transition:all .3s;
+}
+.theme-pill:hover { box-shadow:0 12px 40px rgba(6,182,212,0.2), 0 0 0 1px rgba(6,182,212,0.15); }
+.pill-btn {
+  display:flex; align-items:center; gap:7px; padding:7px 16px; border-radius:40px;
   border:none; cursor:pointer; font-family:'Inter',sans-serif; font-size:12px; font-weight:600;
-  background:transparent; color:var(--text3); transition:all .2s; }
+  background:transparent; color:var(--text3); transition:all .2s;
+}
 .pill-btn.active { background:var(--accent); color:white; box-shadow:0 2px 12px rgba(6,182,212,0.4); }
 .pill-btn:not(.active):hover { color:var(--text); background:rgba(255,255,255,0.05); }
 .pill-sep { width:1px; height:20px; background:var(--border2); margin:0 2px; }
-.pill-collapse { display:flex; align-items:center; justify-content:center;
+.pill-collapse {
+  display:flex; align-items:center; justify-content:center;
   width:28px; height:28px; border-radius:50%; border:none;
-  background:transparent; color:var(--text3); cursor:pointer; transition:all .2s; margin-left:2px; flex-shrink:0; }
+  background:transparent; color:var(--text3); cursor:pointer;
+  transition:all .2s; margin-left:2px; flex-shrink:0;
+}
 .pill-collapse:hover { color:var(--accent); background:rgba(6,182,212,0.1); }
 .pill-collapse svg { transition:transform .3s; }
 .pill-collapse.collapsed svg { transform:rotate(180deg); }
 .pill-inner { display:flex; align-items:center; gap:2px; overflow:hidden;
   max-width:200px; transition:max-width .35s ease, opacity .3s ease; opacity:1; }
 .pill-inner.hidden { max-width:0; opacity:0; pointer-events:none; }
+
+/* FEATURE SVG ICONS */
+.fi { width:40px; height:40px; border-radius:10px; background:rgba(6,182,212,0.1);
+  border:1px solid rgba(6,182,212,0.18); display:flex; align-items:center; justify-content:center;
+  margin-bottom:14px; }
+.fi svg { width:20px; height:20px; }
 
 @media(max-width:800px){
   nav{padding:0 18px;}
@@ -295,26 +314,32 @@ footer a { color:var(--accent); text-decoration:none; }
   <div class="sec-title">Everything you need</div>
   <div class="sec-sub">Built from scratch with GTK4 and Python. No Electron, no bloat.</div>
   <div class="feat-grid">
+    <!-- Multiple Themes -->
     <div class="fc">
       <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div>
       <h3>Multiple Themes</h3><p>Windows 11, macOS, Nova, Minimal, Retro. Each is an independent visual overhaul.</p>
     </div>
+    <!-- Cloud -->
     <div class="fc">
       <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg></div>
       <h3>Cloud Integration</h3><p>OneDrive and Google Drive via rclone — browse cloud files like local ones.</p>
     </div>
+    <!-- Tabs -->
     <div class="fc">
       <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h4l2-4h6l2 4h4v11H3z"/><path d="M3 9v11"/><path d="M21 9v11"/></svg></div>
       <h3>Tabbed Browsing</h3><p>Multiple tabs, drag files between them, stay organized.</p>
     </div>
+    <!-- Performance -->
     <div class="fc">
       <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
       <h3>Native Performance</h3><p>GTK4 + libadwaita. Hardware-accelerated, no web technology overhead.</p>
     </div>
+    <!-- Search -->
     <div class="fc">
       <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
       <h3>Smart Search</h3><p>Filter by type, sort by date or size, breadcrumb navigation.</p>
     </div>
+    <!-- Keyboard -->
     <div class="fc">
       <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M10 14h4"/></svg></div>
       <h3>Keyboard Shortcuts</h3><p>Fully customizable shortcuts for power users.</p>
@@ -327,48 +352,57 @@ footer a { color:var(--accent); text-decoration:none; }
   <div class="sec-title">Get Nebula Files</div>
   <div class="sec-sub">Free and open source. Pick your format below.</div>
   <div class="dl-list">
+
+    <div class="dl-row">
+      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3L3 8l9 5 9-5-9-5zM3 16l9 5 9-5M3 12l9 5 9-5" stroke="#4A90D9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="dl-info">
+        <h3>Flatpak <span class="badge b-ok">Available</span></h3>
+        <p>Universal — all Linux distros with Flatpak</p>
+        <div class="dl-cmd" id="c1"><span>flatpak install flathub org.nebulaprojects.files</span><button class="cp" onclick="cp('c1')">⧉</button></div>
+      </div>
+      <div class="dl-acts"><a href="https://github.com/VisorVP/nebula-files/releases" target="_blank" class="dl-btn av">↓ Download</a></div>
+    </div>
+
     <div class="dl-row">
       <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#f97316" stroke-width="1.8"/><path d="M8 16l4-8 4 8M9.5 13h5" stroke="#f97316" stroke-width="1.8" stroke-linecap="round"/></svg></div>
       <div class="dl-info">
         <h3>AppImage <span class="badge b-ok">Available</span></h3>
         <p>Portable — no installation, just download and run</p>
-        <div class="dl-cmd" id="c1"><span>chmod +x NebulaTiles-*.AppImage && ./NebulaTiles-*.AppImage</span><button class="cp" onclick="cp('c1')">⧉</button></div>
+        <div class="dl-cmd" id="c2"><span>chmod +x NebulaTiles-*.AppImage && ./NebulaTiles-*.AppImage</span><button class="cp" onclick="cp('c2')">⧉</button></div>
       </div>
       <div class="dl-acts"><a href="https://github.com/VisorVP/nebula-files/releases" target="_blank" class="dl-btn av">↓ Download</a></div>
     </div>
+
     <div class="dl-row">
       <div class="dl-icon"><svg viewBox="0 0 24 24" fill="#A81D33"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zm0 13.5c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08s5.97 1.09 6 3.08c-1.29 1.94-3.5 3.22-6 3.22z"/></svg></div>
       <div class="dl-info">
         <h3>Debian / Ubuntu <span class="badge b-ok">Available</span></h3>
         <p>For Ubuntu, Debian, AnduinOS and all .deb-based distros</p>
-        <div class="dl-cmd" id="c2"><span>sudo dpkg -i nebula-files_*.deb && sudo apt-get install -f</span><button class="cp" onclick="cp('c2')">⧉</button></div>
+        <div class="dl-cmd" id="c3"><span>sudo dpkg -i nebula-files_*.deb && sudo apt-get install -f</span><button class="cp" onclick="cp('c3')">⧉</button></div>
       </div>
       <div class="dl-acts"><a href="https://github.com/VisorVP/nebula-files/releases" target="_blank" class="dl-btn av">↓ Download</a></div>
     </div>
+
     <div class="dl-row soon">
       <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6c-2 0-3.77-.98-4.87-2.5" stroke="#51A2DA" stroke-width="1.8" stroke-linecap="round"/><path d="M12 12c0 3.31-2.69 6-6 6S0 15.31 0 12s2.69-6 6-6c2 0 3.77.98 4.87 2.5" stroke="#51A2DA" stroke-width="1.8" stroke-linecap="round"/></svg></div>
       <div class="dl-info">
         <h3>Fedora / RHEL <span class="badge b-soon">Coming Soon</span></h3>
         <p>For Fedora, RHEL, Bazzite and all .rpm-based distros</p>
+        <div class="dl-cmd" id="c4"><span>sudo dnf install nebula-files-*.rpm</span><button class="cp" onclick="cp('c4')">⧉</button></div>
       </div>
       <div class="dl-acts"><span class="dl-btn na">Coming Soon</span></div>
     </div>
-    <div class="dl-row soon">
-      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3L3 8l9 5 9-5-9-5zM3 16l9 5 9-5M3 12l9 5 9-5" stroke="#4A90D9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="dl-info">
-        <h3>Flatpak <span class="badge b-soon">May Come in Future</span></h3>
-        <p>Universal — all Linux distros with Flatpak</p>
-      </div>
-      <div class="dl-acts"><span class="dl-btn na">Not Available</span></div>
-    </div>
+
     <div class="dl-row soon">
       <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="2" stroke="#4A86CF" stroke-width="1.8"/></svg></div>
       <div class="dl-info">
-        <h3>Flathub <span class="badge b-soon">May Come in Future</span></h3>
-        <p>Official Flathub store listing — not yet available</p>
+        <h3>Flathub <span class="badge b-pend">Pending Review</span></h3>
+        <p>Official Flathub store listing — submission under review</p>
+        <div class="dl-cmd" id="c5"><span>flatpak install flathub org.nebulaprojects.files</span><button class="cp" onclick="cp('c5')">⧉</button></div>
       </div>
-      <div class="dl-acts"><span class="dl-btn na">Not Available</span></div>
+      <div class="dl-acts"><span class="dl-btn na">Pending</span></div>
     </div>
+
   </div>
 </section>
 </main>
@@ -379,6 +413,7 @@ footer a { color:var(--accent); text-decoration:none; }
   <a href="index.html">All Apps</a>
 </footer>
 
+<!-- Floating theme pill -->
 <div class="theme-pill" id="themePill">
   <div class="pill-inner" id="pillInner">
     <button class="pill-btn active" id="pillDark" onclick="setPillTheme('dark')">
@@ -401,31 +436,42 @@ footer a { color:var(--accent); text-decoration:none; }
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
 let stars = [], animEnabled = true, animId;
+
 function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+
 function initStars() {
   stars = [];
   for (let i = 0; i < 200; i++) {
-    stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height,
-      r: Math.random()*1.3+0.2, speed: Math.random()*0.12+0.02,
-      opacity: Math.random()*0.7+0.1, twinkleSpeed: Math.random()*0.02+0.005,
-      twinklePhase: Math.random()*Math.PI*2, isTeal: Math.random()>0.6 });
+    stars.push({
+      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+      r: Math.random() * 1.3 + 0.2, speed: Math.random() * 0.12 + 0.02,
+      opacity: Math.random() * 0.7 + 0.1,
+      twinkleSpeed: Math.random() * 0.02 + 0.005,
+      twinklePhase: Math.random() * Math.PI * 2,
+      isTeal: Math.random() > 0.6
+    });
   }
 }
+
 function loop() {
   if (!animEnabled) return;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   stars.forEach(s => {
     s.twinklePhase += s.twinkleSpeed;
-    const op = s.opacity*(0.5+0.5*Math.sin(s.twinklePhase));
-    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    const op = s.opacity * (0.5 + 0.5 * Math.sin(s.twinklePhase));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
     ctx.fillStyle = s.isTeal ? `rgba(34,211,238,${op})` : `rgba(147,197,253,${op})`;
-    ctx.fill(); s.y += s.speed;
-    if (s.y > canvas.height) { s.y=0; s.x=Math.random()*canvas.width; }
+    ctx.fill();
+    s.y += s.speed;
+    if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
   });
   animId = requestAnimationFrame(loop);
 }
+
 resize(); initStars(); loop();
 window.addEventListener('resize', () => { resize(); initStars(); });
+
 function togglePill() {
   const inner = document.getElementById('pillInner');
   const btn = document.getElementById('pillCollapse');
@@ -433,7 +479,6 @@ function togglePill() {
   btn.classList.toggle('collapsed', collapsed);
   localStorage.setItem('nb-pill', collapsed ? '0' : '1');
 }
-function toggleSettings() { document.getElementById('sp').classList.toggle('open'); }
 document.addEventListener('click', e => { if (!e.target.closest('.settings-wrap')) document.getElementById('sp').classList.remove('open'); });
 function setTheme(cb) { setPillTheme(cb.checked ? 'dark' : 'light'); }
 function setPillTheme(t) {

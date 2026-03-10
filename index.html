@@ -1,371 +1,802 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nebula Projects</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-[data-theme="dark"] {
-  --bg: #020810;
-  --surface: #0a1628;
-  --surface2: #0f1e35;
-  --border: rgba(6,182,212,0.12);
-  --border2: rgba(6,182,212,0.22);
-  --accent: #06b6d4;
-  --accent2: #3b82f6;
-  --accent-glow: rgba(6,182,212,0.18);
-  --text: #e2f4f8;
-  --text2: #7eb8c9;
-  --text3: #3a6b7a;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --shadow: 0 25px 60px rgba(0,0,0,0.7);
-}
-[data-theme="light"] {
-  --bg: #f0f9ff;
-  --surface: #ffffff;
-  --surface2: #e0f2fe;
-  --border: rgba(6,182,212,0.18);
-  --border2: rgba(6,182,212,0.3);
-  --accent: #0891b2;
-  --accent2: #2563eb;
-  --accent-glow: rgba(8,145,178,0.12);
-  --text: #0c2340;
-  --text2: #1e6080;
-  --text3: #7eb8c9;
-  --success: #059669;
-  --warning: #d97706;
-  --shadow: 0 25px 60px rgba(0,0,0,0.12);
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; overflow-x:hidden; transition:background .4s,color .4s; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nebula Projects — NebulaFiles</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #06060a;
+            --surface: #0d0d14;
+            --surface2: #14141f;
+            --border: rgba(255,255,255,0.06);
+            --text: #e8e8f0;
+            --text-dim: #8888a0;
+            --accent: #7c6aff;
+            --accent-glow: rgba(124,106,255,0.3);
+            --accent2: #ff6a9f;
+            --accent3: #6affcc;
+            --radius: 16px;
+        }
 
-#bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
-.mesh-blob { position:fixed; pointer-events:none; z-index:0; border-radius:50%; filter:blur(80px); opacity:0.18; }
-.blob1 { width:600px; height:600px; background:radial-gradient(circle,#06b6d4,transparent 70%); top:-150px; left:-100px; animation:blobMove1 18s ease-in-out infinite; }
-.blob2 { width:500px; height:500px; background:radial-gradient(circle,#3b82f6,transparent 70%); bottom:-100px; right:-100px; animation:blobMove2 22s ease-in-out infinite; }
-.blob3 { width:350px; height:350px; background:radial-gradient(circle,#0e7490,transparent 70%); top:40%; left:40%; animation:blobMove3 15s ease-in-out infinite; }
-@keyframes blobMove1 { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(120px,80px) scale(1.1);} 66%{transform:translate(-60px,140px) scale(0.9);} }
-@keyframes blobMove2 { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(-100px,-60px) scale(1.15);} 66%{transform:translate(80px,-120px) scale(0.95);} }
-@keyframes blobMove3 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-80px,60px) scale(1.2);} }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-nav { position:fixed; top:0; left:0; right:0; z-index:200; height:58px; padding:0 48px;
-  display:flex; align-items:center; justify-content:space-between;
-  background:color-mix(in srgb, var(--bg) 80%, transparent);
-  backdrop-filter:blur(24px); border-bottom:1px solid var(--border); }
-.nav-logo { font-family:'Space Mono',monospace; font-weight:700; font-size:16px;
-  background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; letter-spacing:-0.5px; }
-.nav-right { display:flex; align-items:center; gap:6px; }
-.nav-link { color:var(--text2); text-decoration:none; font-size:13px; font-weight:500; padding:6px 12px; border-radius:7px; transition:all .15s; }
-.nav-link:hover { color:var(--text); background:rgba(6,182,212,0.08); }
-.settings-wrap { position:relative; }
-.settings-btn { display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:8px;
-  border:1px solid var(--border); background:var(--surface); color:var(--text2); cursor:pointer; font-size:15px; transition:all .15s; }
-.settings-btn:hover { border-color:var(--accent); color:var(--accent); }
-.settings-panel { position:absolute; top:42px; right:0; width:250px; background:var(--surface);
-  border:1px solid var(--border2); border-radius:14px; padding:16px;
-  box-shadow:var(--shadow); display:none; flex-direction:column; gap:14px; z-index:300; }
-.settings-panel.open { display:flex; }
-.settings-title { font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
-  color:var(--text3); padding-bottom:10px; border-bottom:1px solid var(--border); }
-.setting-row { display:flex; align-items:center; justify-content:space-between; font-size:13px; }
-.setting-row > span { font-weight:500; color:var(--text); }
-.toggle { position:relative; width:40px; height:22px; cursor:pointer; }
-.toggle input { opacity:0; width:0; height:0; }
-.toggle-track { position:absolute; inset:0; border-radius:11px; background:var(--surface2); border:1px solid var(--border2); transition:background .2s; }
-.toggle input:checked + .toggle-track { background:var(--accent); border-color:var(--accent); }
-.toggle-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:white; transition:transform .2s; box-shadow:0 1px 3px rgba(0,0,0,.3); }
-.toggle input:checked ~ .toggle-thumb { transform:translateX(18px); }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
 
-.hero { padding:130px 48px 80px; max-width:800px; margin:0 auto; text-align:center; position:relative; z-index:1; }
-.hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(6,182,212,0.1);
-  border:1px solid rgba(6,182,212,0.25); border-radius:6px; padding:5px 14px; margin-bottom:22px;
-  font-size:11px; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
-.badge-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent); animation:pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 8px var(--accent);} 50%{opacity:.4;box-shadow:0 0 3px var(--accent);} }
-.hero h1 { font-family:'Space Mono',monospace; font-weight:700; font-size:clamp(38px,7vw,80px);
-  line-height:1; letter-spacing:-2px; margin-bottom:10px;
-  background:linear-gradient(135deg,#e2f4f8 0%,#22d3ee 40%,#3b82f6 100%);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.hero-sub { font-family:'Space Mono',monospace; font-size:11px; color:var(--text3); letter-spacing:4px; text-transform:uppercase; margin-bottom:20px; }
-.hero p { font-size:16px; color:var(--text2); line-height:1.75; max-width:500px; margin:0 auto 52px; }
-.stats { display:flex; justify-content:center; gap:48px; margin-bottom:72px; flex-wrap:wrap; }
-.stat-item { text-align:center; }
-.stat-num { font-family:'Space Mono',monospace; font-size:28px; font-weight:700; line-height:1; margin-bottom:5px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.stat-label { font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; font-weight:500; }
+        /* === NEBULA BACKGROUND === */
+        .nebula-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 40%, rgba(124,106,255,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(255,106,159,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 60% at 50% 80%, rgba(106,255,204,0.04) 0%, transparent 50%);
+            pointer-events: none;
+        }
 
-.apps-section { padding:0 48px 100px; max-width:1100px; margin:0 auto; position:relative; z-index:1; }
-.sec-eyebrow { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:8px; font-weight:700; text-align:center; }
-.sec-title { font-family:'Space Mono',monospace; font-weight:700; font-size:clamp(20px,3vw,28px); letter-spacing:-1px; margin-bottom:32px; color:var(--text); text-align:center; }
-.apps-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:14px; }
+        .stars {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0;
+            background-image:
+                radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
+                radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3), transparent),
+                radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1px 1px at 90% 70%, rgba(255,255,255,0.4), transparent),
+                radial-gradient(1.5px 1.5px at 15% 80%, rgba(124,106,255,0.6), transparent),
+                radial-gradient(1px 1px at 85% 90%, rgba(255,255,255,0.3), transparent),
+                radial-gradient(1px 1px at 45% 45%, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1.5px 1.5px at 65% 15%, rgba(255,106,159,0.5), transparent),
+                radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.3), transparent),
+                radial-gradient(1px 1px at 55% 75%, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1px 1px at 5% 55%, rgba(106,255,204,0.4), transparent),
+                radial-gradient(1px 1px at 75% 85%, rgba(255,255,255,0.3), transparent),
+                radial-gradient(1px 1px at 95% 25%, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1px 1px at 40% 95%, rgba(255,255,255,0.4), transparent);
+            pointer-events: none;
+        }
 
-.app-card { background:rgba(255,255,255,0.03); border:1px solid rgba(6,182,212,0.15);
-  border-radius:14px; padding:28px; text-decoration:none; color:var(--text);
-  transition:all .25s; position:relative; overflow:hidden; display:block;
-  backdrop-filter:blur(40px) saturate(150%); -webkit-backdrop-filter:blur(40px) saturate(150%); }
-.app-card::before { content:''; position:absolute; inset:0;
-  background:linear-gradient(135deg,rgba(6,182,212,0.06) 0%,rgba(59,130,246,0.04) 100%); opacity:0; transition:opacity .25s; }
-.app-card:not(.soon):hover { border-color:rgba(6,182,212,0.45); transform:translateY(-3px); box-shadow:0 0 40px rgba(6,182,212,0.15), 0 16px 40px rgba(0,0,0,.3); background:rgba(255,255,255,0.06); }
-.app-card:not(.soon):hover::before { opacity:1; }
-.app-card.soon { opacity:.45; cursor:default; pointer-events:none; }
-[data-theme="light"] .app-card { background:rgba(255,255,255,0.25); border-color:rgba(6,182,212,0.2); }
-[data-theme="light"] .app-card:not(.soon):hover { background:rgba(255,255,255,0.45); }
+        /* === NAV === */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(6,6,10,0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
 
-.card-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:18px; }
-.card-icon { width:48px; height:48px; border-radius:11px; background:rgba(6,182,212,0.1);
-  border:1px solid rgba(6,182,212,0.2); display:flex; align-items:center; justify-content:center; font-size:22px; }
-.card-status { font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; padding:3px 9px; border-radius:5px; }
-.s-active { background:rgba(16,185,129,.15); color:var(--success); border:1px solid rgba(16,185,129,.25); }
-.s-soon { background:rgba(245,158,11,.15); color:var(--warning); border:1px solid rgba(245,158,11,.25); }
-.app-card h3 { font-family:'Space Mono',monospace; font-weight:700; font-size:17px; letter-spacing:-.5px; margin-bottom:6px; }
-.app-card p { font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:18px; }
-.card-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px; }
-.tag { font-size:10px; padding:2px 8px; border-radius:4px; background:rgba(6,182,212,0.07); color:var(--text3); border:1px solid var(--border); font-weight:500; }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+        }
 
-.mini-mockup { border-radius:10px; overflow:hidden; border:1px solid rgba(6,182,212,0.2);
-  box-shadow:0 8px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(6,182,212,0.1); margin-bottom:4px; }
-.mini-bar { background:rgba(2,8,18,0.88); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-  padding:6px 10px; display:flex; align-items:center; gap:7px; border-bottom:1px solid rgba(6,182,212,0.15); }
-.mini-dots { display:flex; gap:4px; }
-.mini-title { flex:1; text-align:center; font-size:8px; color:var(--text3); font-family:'Space Mono',monospace; }
-.mini-body { display:flex; height:110px; }
-.mini-sidebar { width:80px; background:rgba(2,8,20,0.82); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-  padding:6px 4px; border-right:1px solid rgba(6,182,212,0.1); display:flex; flex-direction:column; gap:1px; flex-shrink:0; }
-.mini-item { font-size:7px; color:var(--text3); padding:3px 6px; border-radius:4px; white-space:nowrap; overflow:hidden; }
-.mini-item.active { background:rgba(6,182,212,0.2); color:var(--accent); }
-.mini-files { flex:1; padding:8px; display:grid; grid-template-columns:repeat(3,1fr); gap:5px; align-content:start;
-  background:rgba(1,5,14,0.72); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
-.mini-file { display:flex; flex-direction:column; align-items:center; gap:2px; }
-.mini-fi { width:22px; height:22px; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:10px; }
-.mini-file span { font-size:6px; color:var(--text3); text-align:center; white-space:nowrap; overflow:hidden; max-width:100%; text-overflow:ellipsis; }
-[data-theme="light"] .mini-bar { background:rgba(255,255,255,0.7); }
-[data-theme="light"] .mini-sidebar { background:rgba(200,230,255,0.65); }
-[data-theme="light"] .mini-files { background:rgba(180,220,255,0.4); }
+        .nav-logo {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 16px; color: white;
+        }
 
-.card-footer { display:flex; align-items:center; justify-content:space-between; }
-.card-link { font-size:12px; color:var(--accent); font-weight:600; display:flex; align-items:center; gap:5px; transition:gap .15s; }
-.app-card:hover .card-link { gap:9px; }
-.card-version { font-family:'Space Mono',monospace; font-size:10px; color:var(--text3); }
+        .nav-brand span { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; }
 
-footer { border-top:1px solid var(--border); padding:28px 48px; text-align:center; color:var(--text3); font-size:12px; position:relative; z-index:1; }
-footer a { color:var(--accent); text-decoration:none; }
+        .nav-links { display: flex; gap: 32px; align-items: center; }
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text); }
 
-.theme-pill {
-  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
-  z-index:500; display:flex; align-items:center; gap:2px;
-  background:color-mix(in srgb,var(--surface) 70%,transparent);
-  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-  border:1px solid var(--border2); border-radius:50px;
-  padding:5px; box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04); transition:all .3s;
-}
-.theme-pill:hover { box-shadow:0 12px 40px rgba(6,182,212,0.2), 0 0 0 1px rgba(6,182,212,0.15); }
-.pill-btn { display:flex; align-items:center; gap:7px; padding:7px 16px; border-radius:40px;
-  border:none; cursor:pointer; font-family:'Inter',sans-serif; font-size:12px; font-weight:600;
-  background:transparent; color:var(--text3); transition:all .2s; }
-.pill-btn.active { background:var(--accent); color:white; box-shadow:0 2px 12px rgba(6,182,212,0.4); }
-.pill-btn:not(.active):hover { color:var(--text); background:rgba(255,255,255,0.05); }
-.pill-sep { width:1px; height:20px; background:var(--border2); margin:0 2px; }
-.pill-collapse { display:flex; align-items:center; justify-content:center;
-  width:28px; height:28px; border-radius:50%; border:none;
-  background:transparent; color:var(--text3); cursor:pointer; transition:all .2s; margin-left:2px; flex-shrink:0; }
-.pill-collapse:hover { color:var(--accent); background:rgba(6,182,212,0.1); }
-.pill-collapse svg { transition:transform .3s; }
-.pill-collapse.collapsed svg { transform:rotate(180deg); }
-.pill-inner { display:flex; align-items:center; gap:2px; overflow:hidden;
-  max-width:200px; transition:max-width .35s ease, opacity .3s ease; opacity:1; }
-.pill-inner.hidden { max-width:0; opacity:0; pointer-events:none; }
+        .nav-github {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav-github:hover { background: rgba(255,255,255,0.10); }
 
-@media(max-width:768px){
-  nav{padding:0 18px;}
-  .hero{padding:90px 18px 60px;}
-  .stats{gap:28px;}
-  .apps-section{padding:0 18px 70px;}
-  footer{padding:22px 18px;}
-}
-</style>
+        /* === HERO === */
+        .hero {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(124,106,255,0.1);
+            border: 1px solid rgba(124,106,255,0.2);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent);
+            margin-bottom: 32px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .hero-badge .dot {
+            width: 6px; height: 6px;
+            background: var(--accent3);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        h1 {
+            font-size: clamp(48px, 8vw, 88px);
+            font-weight: 800;
+            letter-spacing: -3px;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.6s ease 0.1s backwards;
+        }
+
+        h1 .gradient {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 18px;
+            color: var(--text-dim);
+            max-width: 520px;
+            margin-bottom: 48px;
+            font-weight: 300;
+            animation: fadeInUp 0.6s ease 0.2s backwards;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeInUp 0.6s ease 0.3s backwards;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #6a56e8);
+            color: white;
+            box-shadow: 0 4px 24px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.10);
+            transform: translateY(-2px);
+        }
+
+        /* === SCREENSHOT === */
+        .hero-screenshot {
+            margin-top: 64px;
+            max-width: 900px;
+            width: 100%;
+            animation: fadeInUp 0.8s ease 0.4s backwards;
+        }
+
+        .screenshot-frame {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 120px var(--accent-glow);
+        }
+
+        .screenshot-titlebar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .screenshot-dots { display: flex; gap: 6px; }
+        .screenshot-dots span {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+        }
+        .screenshot-dots span:nth-child(1) { background: #ff5f57; }
+        .screenshot-dots span:nth-child(2) { background: #ffbd2e; }
+        .screenshot-dots span:nth-child(3) { background: #28c840; }
+
+        .screenshot-title {
+            flex: 1;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .screenshot-body {
+            padding: 32px;
+            display: flex;
+            gap: 24px;
+            min-height: 340px;
+        }
+
+        .mock-sidebar {
+            width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mock-sidebar-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mock-sidebar-item.active {
+            background: rgba(124,106,255,0.15);
+            color: var(--accent);
+        }
+        .mock-sidebar-item .icon {
+            width: 16px; height: 16px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.1);
+        }
+        .mock-sidebar-item.active .icon { background: var(--accent); }
+
+        .mock-files {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 16px;
+            align-content: start;
+        }
+
+        .mock-file {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mock-file-icon {
+            width: 48px; height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .mock-file-icon.folder { background: linear-gradient(135deg, #ffc629, #e0a800); }
+        .mock-file-icon.image { background: linear-gradient(135deg, #4a90d9, #3570b0); }
+        .mock-file-icon.doc { background: linear-gradient(135deg, #6affcc, #40d09a); }
+        .mock-file-icon.code { background: linear-gradient(135deg, #ff6a9f, #d04070); }
+        .mock-file-icon.video { background: linear-gradient(135deg, #9c6aff, #7040d0); }
+
+        .mock-file-name {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-align: center;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* === FEATURES === */
+        .section {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 100px 24px;
+        }
+
+        .section-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .section h2 {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            font-size: 17px;
+            color: var(--text-dim);
+            max-width: 560px;
+            margin-bottom: 56px;
+            font-weight: 300;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: all 0.3s;
+        }
+        .feature-card:hover {
+            border-color: rgba(124,106,255,0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+
+        .feature-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: var(--text-dim);
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        /* === DOWNLOADS === */
+        .downloads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .download-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: all 0.3s;
+        }
+        .download-card:hover {
+            border-color: rgba(124,106,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .download-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .download-os {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .download-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .download-info span {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .download-card .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .download-note {
+            font-size: 12px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* === INSTALL COMMANDS === */
+        .install-cmd {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--accent3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .install-cmd:hover { border-color: rgba(106,255,204,0.3); }
+        .install-cmd .copy-btn {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .install-cmd .copy-btn:hover { color: var(--text); }
+
+        /* === FOOTER === */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        footer a { color: var(--accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* === ANIMATIONS === */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            nav { padding: 12px 16px; }
+            .nav-links { display: none; }
+            .hero { padding: 100px 16px 60px; }
+            .hero-actions { flex-direction: column; width: 100%; max-width: 300px; }
+            .btn { width: 100%; justify-content: center; }
+            .screenshot-body { flex-direction: column; }
+            .mock-sidebar { width: 100%; flex-direction: row; overflow-x: auto; }
+            .section { padding: 60px 16px; }
+        }
+    </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
-<div class="mesh-blob blob1"></div>
-<div class="mesh-blob blob2"></div>
-<div class="mesh-blob blob3"></div>
+<div class="nebula-bg"></div>
+<div class="stars"></div>
 
+<!-- NAV -->
 <nav>
-  <a href="index.html" class="nav-logo">NEBULA</a>
-  <div class="nav-right">
-    <a href="#apps" class="nav-link">Apps</a>
-    <a href="https://github.com/VisorVP" target="_blank" class="nav-link">GitHub</a>
-    <div class="settings-wrap">
-      <button class="settings-btn" onclick="toggleSettings()" title="Settings">⚙</button>
-      <div class="settings-panel" id="sp">
-        <div class="settings-title">Preferences</div>
-        <div class="setting-row">
-          <span>Dark Mode</span>
-          <label class="toggle"><input type="checkbox" id="darkT" checked onchange="setTheme(this)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-        </div>
-        <div class="setting-row">
-          <span>Animations</span>
-          <label class="toggle"><input type="checkbox" id="animT" checked onchange="toggleAnim(this)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-        </div>
-      </div>
+    <a class="nav-brand" href="#">
+        <div class="nav-logo">N</div>
+        <span>Nebula Projects</span>
+    </a>
+    <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#downloads">Downloads</a>
+        <a href="https://github.com/VisorVP" class="nav-github">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            GitHub
+        </a>
     </div>
-  </div>
 </nav>
 
-<main>
+<!-- HERO -->
 <section class="hero">
-  <div class="hero-badge"><div class="badge-dot"></div>Open Source</div>
-  <h1>NEBULA<br>PROJECTS</h1>
-  <div class="hero-sub">Linux · Open Source · Free</div>
-  <p>A collection of modern, open-source apps for Linux and beyond. Built with care, designed for everyone.</p>
-  <div class="stats">
-    <div class="stat-item"><div class="stat-num">1</div><div class="stat-label">App Released</div></div>
-    <div class="stat-item"><div class="stat-num">GTK4</div><div class="stat-label">Framework</div></div>
-    <div class="stat-item"><div class="stat-num">0$</div><div class="stat-label">Always Free</div></div>
-    <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">Open Source</div></div>
-  </div>
-</section>
-
-<section class="apps-section" id="apps">
-  <div class="sec-eyebrow">Our Apps</div>
-  <div class="sec-title">What we've built</div>
-  <div class="apps-grid">
-    <a href="nebulafiles.html" class="app-card">
-      <div class="card-top">
-        <div class="card-icon">🗂</div>
-        <span class="card-status s-active">Active</span>
-      </div>
-      <h3>Nebula Files</h3>
-      <p>A modern GTK4 file manager with multiple themes, cloud drive integration, tabbed browsing, and split view.</p>
-      <div class="mini-mockup">
-        <div class="mini-bar">
-          <div class="mini-dots"><span class="md r"></span><span class="md y"></span><span class="md g"></span></div>
-          <span class="mini-title">Nebula Files — Home</span>
-        </div>
-        <div class="mini-body">
-          <div class="mini-sidebar">
-            <div class="mini-item active">🏠 Home</div>
-            <div class="mini-item">⬇ Downloads</div>
-            <div class="mini-item">🖼 Pictures</div>
-            <div class="mini-item">☁ OneDrive</div>
-          </div>
-          <div class="mini-files">
-            <div class="mini-file"><div class="mini-fi" style="background:rgba(245,158,11,0.15)">📁</div><span>Documents</span></div>
-            <div class="mini-file"><div class="mini-fi" style="background:rgba(245,158,11,0.15)">📁</div><span>Projects</span></div>
-            <div class="mini-file"><div class="mini-fi" style="background:rgba(59,130,246,0.15)">🖼</div><span>photo.png</span></div>
-            <div class="mini-file"><div class="mini-fi" style="background:rgba(16,185,129,0.15)">📄</div><span>notes.md</span></div>
-            <div class="mini-file"><div class="mini-fi" style="background:rgba(236,72,153,0.15)">⟨⟩</div><span>main.py</span></div>
-            <div class="mini-file"><div class="mini-fi" style="background:rgba(139,92,246,0.15)">▶</div><span>demo.mp4</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer" style="margin-top:14px">
-        <span class="card-link">Learn more →</span>
-        <span class="card-version">v4.2.3</span>
-      </div>
-    </a>
-    <div class="app-card soon">
-      <div class="card-top">
-        <div class="card-icon">🚀</div>
-        <span class="card-status s-soon">Soon</span>
-      </div>
-      <h3>More Apps</h3>
-      <p>More Nebula apps are in development. Stay tuned for updates and new releases!</p>
-      <div class="card-tags"><span class="tag">Coming Soon</span></div>
-      <div class="card-footer"><span class="card-link">Stay tuned</span></div>
+    <div class="hero-badge">
+        <span class="dot"></span>
+        NebulaFiles v2.6 — Now Available
     </div>
-  </div>
-</section>
-</main>
+    <h1>A file manager<br>from the <span class="gradient">future</span></h1>
+    <p class="hero-sub">Modern, fast, and beautiful. NebulaFiles brings Windows 11 Explorer aesthetics to Linux with native GTK4 performance.</p>
+    <div class="hero-actions">
+        <a href="#downloads" class="btn btn-primary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Download for Linux
+        </a>
+        <a href="https://github.com/VisorVP/VisorVP.github.io" class="btn btn-secondary">
+            View Source
+        </a>
+    </div>
 
+    <!-- MOCK SCREENSHOT -->
+    <div class="hero-screenshot">
+        <div class="screenshot-frame">
+            <div class="screenshot-titlebar">
+                <div class="screenshot-dots"><span></span><span></span><span></span></div>
+                <div class="screenshot-title">NebulaFiles — Home</div>
+                <div style="width:48px"></div>
+            </div>
+            <div class="screenshot-body">
+                <div class="mock-sidebar">
+                    <div class="mock-sidebar-item active"><div class="icon"></div>Home</div>
+                    <div class="mock-sidebar-item"><div class="icon"></div>Downloads</div>
+                    <div class="mock-sidebar-item"><div class="icon"></div>Pictures</div>
+                    <div class="mock-sidebar-item"><div class="icon"></div>Music</div>
+                    <div class="mock-sidebar-item"><div class="icon"></div>Videos</div>
+                    <div class="mock-sidebar-item"><div class="icon"></div>Games</div>
+                </div>
+                <div class="mock-files">
+                    <div class="mock-file"><div class="mock-file-icon folder">📁</div><div class="mock-file-name">Documents</div></div>
+                    <div class="mock-file"><div class="mock-file-icon folder">📁</div><div class="mock-file-name">Downloads</div></div>
+                    <div class="mock-file"><div class="mock-file-icon folder">📁</div><div class="mock-file-name">Projects</div></div>
+                    <div class="mock-file"><div class="mock-file-icon image">🖼</div><div class="mock-file-name">wallpaper.png</div></div>
+                    <div class="mock-file"><div class="mock-file-icon doc">📄</div><div class="mock-file-name">notes.md</div></div>
+                    <div class="mock-file"><div class="mock-file-icon code">⟨⟩</div><div class="mock-file-name">main.py</div></div>
+                    <div class="mock-file"><div class="mock-file-icon video">▶</div><div class="mock-file-name">demo.mp4</div></div>
+                    <div class="mock-file"><div class="mock-file-icon folder">📁</div><div class="mock-file-name">Games</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section fade-in" id="features">
+    <div class="section-label">Features</div>
+    <h2>Everything you need</h2>
+    <p class="section-desc">Built from scratch with GTK4 and Python. No Electron, no bloat — just speed.</p>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(124,106,255,0.15);">🎨</div>
+            <h3>Windows 11 Theme</h3>
+            <p>Authentic Win11 Explorer experience on Linux — folder icons, sidebar, toolbar, and navigation all match the real thing.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(255,106,159,0.15);">⚡</div>
+            <h3>Native Performance</h3>
+            <p>Built with GTK4 and libadwaita. No web technology, no wrapper — pure native speed with hardware-accelerated rendering.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(106,255,204,0.15);">📂</div>
+            <h3>Tabbed Browsing</h3>
+            <p>Multiple tabs with tab management. Open new folders in tabs, drag between them, and keep your workflow organized.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(255,200,80,0.15);">☁️</div>
+            <h3>Cloud Integration</h3>
+            <p>OneDrive and Google Drive appear automatically in your sidebar through GNOME Online Accounts. No extra setup.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(120,200,255,0.15);">🔍</div>
+            <h3>Smart Search</h3>
+            <p>Search files instantly. Filter by type, sort by date or size, and navigate with breadcrumb paths.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background: rgba(200,120,255,0.15);">🎯</div>
+            <h3>Multiple Themes</h3>
+            <p>Switch between Windows 11, macOS, Nova, and Minimal themes. Each one is a complete visual overhaul, not just colors.</p>
+        </div>
+    </div>
+</section>
+
+<!-- DOWNLOADS -->
+<section class="section fade-in" id="downloads">
+    <div class="section-label">Downloads</div>
+    <h2>Get NebulaFiles</h2>
+    <p class="section-desc">Free and open source. Choose your preferred format below.</p>
+
+    <div class="downloads-grid">
+        <div class="download-card">
+            <div class="download-header">
+                <div class="download-os">🐧</div>
+                <div class="download-info">
+                    <h3>Linux — Universal</h3>
+                    <span>Python + GTK4 (all distros)</span>
+                </div>
+            </div>
+            <div class="install-cmd" onclick="copyCmd(this, 'bash install.sh')">
+                <code>$ bash install.sh</code>
+                <button class="copy-btn" title="Copy">📋</button>
+            </div>
+            <a href="https://github.com/VisorVP/VisorVP.github.io/releases/latest" class="btn btn-primary">
+                Download .zip
+            </a>
+            <div class="download-note">Requires: python3, gtk4, libadwaita</div>
+        </div>
+
+        <div class="download-card">
+            <div class="download-header">
+                <div class="download-os">📦</div>
+                <div class="download-info">
+                    <h3>Debian / Ubuntu</h3>
+                    <span>.deb package</span>
+                </div>
+            </div>
+            <div class="install-cmd" onclick="copyCmd(this, 'sudo dpkg -i nebulafiles.deb')">
+                <code>$ sudo dpkg -i nebulafiles.deb</code>
+                <button class="copy-btn" title="Copy">📋</button>
+            </div>
+            <a href="https://github.com/VisorVP/VisorVP.github.io/releases/latest" class="btn btn-secondary">
+                Download .deb
+            </a>
+            <div class="download-note">Ubuntu 22.04+, Debian 12+, Mint 21+</div>
+        </div>
+
+        <div class="download-card">
+            <div class="download-header">
+                <div class="download-os">🎩</div>
+                <div class="download-info">
+                    <h3>Fedora / RHEL</h3>
+                    <span>.rpm package</span>
+                </div>
+            </div>
+            <div class="install-cmd" onclick="copyCmd(this, 'sudo rpm -i nebulafiles.rpm')">
+                <code>$ sudo rpm -i nebulafiles.rpm</code>
+                <button class="copy-btn" title="Copy">📋</button>
+            </div>
+            <a href="https://github.com/VisorVP/VisorVP.github.io/releases/latest" class="btn btn-secondary">
+                Download .rpm
+            </a>
+            <div class="download-note">Fedora 38+, RHEL 9+</div>
+        </div>
+
+        <div class="download-card">
+            <div class="download-header">
+                <div class="download-os">📐</div>
+                <div class="download-info">
+                    <h3>Arch Linux</h3>
+                    <span>AUR package</span>
+                </div>
+            </div>
+            <div class="install-cmd" onclick="copyCmd(this, 'yay -S nebulafiles')">
+                <code>$ yay -S nebulafiles</code>
+                <button class="copy-btn" title="Copy">📋</button>
+            </div>
+            <a href="https://github.com/VisorVP/VisorVP.github.io/releases/latest" class="btn btn-secondary">
+                AUR Page
+            </a>
+            <div class="download-note">Arch, Manjaro, EndeavourOS</div>
+        </div>
+
+        <div class="download-card" style="opacity: 0.5;">
+            <div class="download-header">
+                <div class="download-os">🪟</div>
+                <div class="download-info">
+                    <h3>Windows</h3>
+                    <span>Coming soon</span>
+                </div>
+            </div>
+            <a href="#" class="btn btn-secondary" style="pointer-events: none;">
+                Coming Soon
+            </a>
+        </div>
+
+        <div class="download-card" style="opacity: 0.5;">
+            <div class="download-header">
+                <div class="download-os">🍎</div>
+                <div class="download-info">
+                    <h3>macOS</h3>
+                    <span>Coming soon</span>
+                </div>
+            </div>
+            <a href="#" class="btn btn-secondary" style="pointer-events: none;">
+                Coming Soon
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
 <footer>
-  Made with care by <a href="https://github.com/VisorVP" target="_blank">Nebula Projects</a> ·
-  <a href="https://github.com/nebula-projectz/nebula-projectz.github.io" target="_blank">View Source</a>
+    <p>Made with care by <a href="https://github.com/VisorVP">Nebula Projects</a> — Open source under MIT License</p>
 </footer>
 
-<div class="theme-pill">
-  <div class="pill-inner" id="pillInner">
-    <button class="pill-btn active" id="pillDark" onclick="setPillTheme('dark')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
-      Dark
-    </button>
-    <div class="pill-sep"></div>
-    <button class="pill-btn" id="pillLight" onclick="setPillTheme('light')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      Light
-    </button>
-    <div class="pill-sep"></div>
-  </div>
-  <button class="pill-collapse" id="pillCollapse" onclick="togglePill()" title="Hide/Show">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-  </button>
-</div>
-
 <script>
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-let stars = [], animEnabled = true, animId;
-function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-function initStars() {
-  stars = [];
-  for (let i = 0; i < 200; i++) {
-    stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height,
-      r: Math.random()*1.4+0.2, speed: Math.random()*0.15+0.02,
-      opacity: Math.random()*0.7+0.1, twinkleSpeed: Math.random()*0.02+0.005,
-      twinklePhase: Math.random()*Math.PI*2,
-      color: Math.random()>0.6 ? '#22d3ee' : Math.random()>0.5 ? '#93c5fd' : '#e2f4f8' });
-  }
-}
-function drawStars() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  stars.forEach(s => {
-    s.twinklePhase += s.twinkleSpeed;
-    const op = s.opacity*(0.5+0.5*Math.sin(s.twinklePhase));
-    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-    ctx.fillStyle = s.color.replace('#22d3ee',`rgba(34,211,238,${op})`).replace('#93c5fd',`rgba(147,197,253,${op})`).replace('#e2f4f8',`rgba(226,244,248,${op})`);
-    ctx.fill(); s.y += s.speed;
-    if (s.y > canvas.height) { s.y=0; s.x=Math.random()*canvas.width; }
-  });
-}
-function loop() { if (animEnabled) { drawStars(); animId = requestAnimationFrame(loop); } }
-resize(); initStars(); loop();
-window.addEventListener('resize', () => { resize(); initStars(); });
-function toggleSettings() { document.getElementById('sp').classList.toggle('open'); }
-document.addEventListener('click', e => { if (!e.target.closest('.settings-wrap')) document.getElementById('sp').classList.remove('open'); });
-function togglePill() {
-  const inner = document.getElementById('pillInner');
-  const btn = document.getElementById('pillCollapse');
-  const collapsed = inner.classList.toggle('hidden');
-  btn.classList.toggle('collapsed', collapsed);
-  localStorage.setItem('nb-pill', collapsed ? '0' : '1');
-}
-function setTheme(cb) { setPillTheme(cb.checked ? 'dark' : 'light'); }
-function setPillTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('nb-theme', t);
-  document.getElementById('darkT').checked = t === 'dark';
-  document.getElementById('pillDark').classList.toggle('active', t === 'dark');
-  document.getElementById('pillLight').classList.toggle('active', t === 'light');
-}
-function toggleAnim(cb) {
-  animEnabled = cb.checked;
-  if (animEnabled) loop(); else { cancelAnimationFrame(animId); ctx.clearRect(0,0,canvas.width,canvas.height); }
-  localStorage.setItem('nb-anim', cb.checked ? '1' : '0');
-}
-(function(){
-  const t = localStorage.getItem('nb-theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', t);
-  document.getElementById('darkT').checked = t === 'dark';
-  document.getElementById('pillDark').classList.toggle('active', t === 'dark');
-  document.getElementById('pillLight').classList.toggle('active', t === 'light');
-  const a = localStorage.getItem('nb-anim');
-  if (a === '0') { document.getElementById('animT').checked = false; toggleAnim({checked:false}); }
-})();
+    // Copy command to clipboard
+    function copyCmd(el, cmd) {
+        navigator.clipboard.writeText(cmd);
+        const btn = el.querySelector('.copy-btn');
+        btn.textContent = '✓';
+        setTimeout(() => btn.textContent = '📋', 1500);
+    }
+
+    // Scroll fade-in
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 </script>
+
 </body>
 </html>
