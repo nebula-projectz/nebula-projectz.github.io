@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nebula Vantage — A media player from the future</title>
+  <meta name="description" content="A modern GTK4 media player for Linux. Audio, video, playlists, custom icons, and more. Free and open source." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       VARIABLES & RESET
+    ============================================================ */
+    :root {
+      --bg: #0a0a0f;
+      --bg2: #111118;
+      --bg3: #18181f;
+      --border: rgba(255,255,255,0.07);
+      --text: #e8e8f0;
+      --text2: #8888a8;
+      --text3: #55556a;
+      --accent: #2563eb;
+      --accent2: #3b82f6;
+      --accent-glow: rgba(37,99,235,0.25);
+      --beta: #f59e0b;
+      --beta-bg: rgba(245,158,11,0.1);
+      --beta-border: rgba(245,158,11,0.3);
+      --card: #13131a;
+      --card-border: rgba(255,255,255,0.06);
+      --nav-h: 56px;
+      --radius: 12px;
+      --font-mono: 'Space Mono', monospace;
+      --font: 'DM Sans', sans-serif;
+    }
+    [data-theme="light"] {
+      --bg: #f4f4f8;
+      --bg2: #ffffff;
+      --bg3: #ebebf2;
+      --border: rgba(0,0,0,0.08);
+      --text: #18181f;
+      --text2: #55556a;
+      --text3: #9898b0;
+      --accent: #2563eb;
+      --accent2: #1d4ed8;
+      --accent-glow: rgba(37,99,235,0.12);
+      --beta: #d97706;
+      --beta-bg: rgba(245,158,11,0.08);
+      --beta-border: rgba(245,158,11,0.25);
+      --card: #ffffff;
+      --card-border: rgba(0,0,0,0.07);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+      transition: background 0.3s, color 0.3s;
+    }
+    a { color: inherit; text-decoration: none; }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 5px;
+      color: var(--accent2);
+    }
+
+    /* ============================================================
+       NAV
+    ============================================================ */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--nav-h);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 24px; gap: 8px;
+      backdrop-filter: blur(12px);
+    }
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      margin-right: 8px;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-sep { color: var(--text3); margin: 0 4px; }
+    .nav-crumb { color: var(--text2); font-size: 13px; }
+    .nav-links { display: flex; gap: 4px; margin-left: auto; align-items: center; }
+    .nav-links a {
+      padding: 6px 12px; border-radius: 8px;
+      font-size: 13px; font-weight: 500; color: var(--text2);
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-links a:hover { background: var(--bg3); color: var(--text); }
+    .nav-links a.github {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .nav-links a.github:hover { border-color: var(--accent); color: var(--accent); }
+    .theme-btn {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--bg3); border: 1px solid var(--border);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; margin-left: 4px; transition: border-color 0.15s;
+      color: var(--text2);
+    }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .back-link {
+      display: inline-flex; align-items: center; gap-6px;
+      padding: 40px 0 0 0;
+      margin: 0 auto;
+      max-width: 900px;
+      width: 100%;
+      padding-left: 24px;
+    }
+    .back-link a {
+      font-size: 13px; color: var(--text2);
+      display: flex; align-items: center; gap: 5px;
+      transition: color 0.15s;
+    }
+    .back-link a:hover { color: var(--accent); }
+
+    .hero {
+      max-width: 900px; margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--beta-bg); border: 1px solid var(--beta-border);
+      color: var(--beta); border-radius: 20px;
+      padding: 4px 12px; font-size: 12px; font-weight: 600;
+      margin-bottom: 20px; letter-spacing: 0.04em;
+    }
+    .hero-badge::before { content: "⚠"; font-size: 11px; }
+    .hero-type {
+      font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+      color: var(--accent); text-transform: uppercase;
+      margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .hero-meta {
+      font-size: 13px; color: var(--text2); margin-bottom: 20px;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    }
+    .hero-meta span {
+      background: var(--bg3); border: 1px solid var(--border);
+      padding: 3px 10px; border-radius: 20px;
+    }
+    .hero-meta .beta-tag {
+      background: var(--beta-bg); border-color: var(--beta-border);
+      color: var(--beta);
+    }
+    .hero-desc {
+      font-size: 17px; color: var(--text2); max-width: 560px;
+      line-height: 1.65; margin-bottom: 32px;
+    }
+    .hero-ctas { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--accent); color: #fff;
+      padding: 10px 22px; border-radius: 10px;
+      font-size: 14px; font-weight: 600;
+      transition: background 0.15s, transform 0.1s;
+      border: none; cursor: pointer;
+    }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--bg3); color: var(--text);
+      padding: 10px 22px; border-radius: 10px;
+      font-size: 14px; font-weight: 500;
+      border: 1px solid var(--border);
+      transition: border-color 0.15s, transform 0.1s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+    /* ============================================================
+       MOCK UI
+    ============================================================ */
+    .mock-wrap {
+      max-width: 900px; margin: 0 auto; padding: 0 24px 80px;
+    }
+    .mock-window {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    }
+    .mock-titlebar {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mock-dot.r { background: #ff5f57; }
+    .mock-dot.y { background: #ffbd2e; }
+    .mock-dot.g { background: #28c840; }
+    .mock-title {
+      flex: 1; text-align: center;
+      font-size: 12px; font-weight: 600; color: var(--text2);
+    }
+    .mock-body {
+      display: flex; height: 320px;
+    }
+    .mock-sidebar {
+      width: 180px; min-width: 180px;
+      background: var(--bg3);
+      border-right: 1px solid var(--border);
+      padding: 12px 0;
+    }
+    .mock-sidebar-logo {
+      padding: 4px 14px 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .mock-logo-row { display: flex; align-items: center; gap: 6px; }
+    .mock-logo-v {
+      font-family: var(--font-mono);
+      font-weight: 700; font-size: 16px;
+      color: var(--accent);
+    }
+    .mock-logo-name { font-size: 12px; font-weight: 600; color: var(--text); }
+    .mock-logo-sub { font-size: 9px; color: var(--text3); letter-spacing: 0.1em; margin-top: 1px; }
+    .mock-section { padding: 6px 14px 2px; font-size: 9px; font-weight: 700; color: var(--text3); letter-spacing: 0.1em; }
+    .mock-nav-item {
+      padding: 6px 14px; font-size: 12px; color: var(--text2);
+      display: flex; align-items: center; gap: 7px;
+      border-radius: 6px; margin: 0 6px;
+      transition: background 0.1s;
+    }
+    .mock-nav-item.active { background: rgba(37,99,235,0.15); color: var(--accent); font-weight: 600; }
+    .mock-nav-item .ico { font-size: 13px; }
+    .mock-content { flex: 1; padding: 16px; overflow: hidden; }
+    .mock-content-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+    .mock-pl-card {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px; margin-bottom: 8px;
+    }
+    .mock-pl-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .mock-pl-icon {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .mock-pl-name { font-size: 13px; font-weight: 600; }
+    .mock-pl-count { font-size: 11px; color: var(--text2); }
+    .mock-pl-actions { display: flex; gap: 5px; margin-left: auto; }
+    .mock-pl-btn {
+      padding: 3px 8px; border-radius: 5px; font-size: 11px;
+      background: var(--accent); color: #fff; font-weight: 500;
+    }
+    .mock-pl-btn.sec { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); }
+    .mock-track {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 0; border-top: 1px solid var(--border);
+      font-size: 11px;
+    }
+    .mock-track-ico {
+      width: 24px; height: 24px; border-radius: 5px;
+      background: var(--bg2); border: 1px dashed var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; flex-shrink: 0;
+    }
+    .mock-track-info { flex: 1; }
+    .mock-track-title { font-size: 11px; font-weight: 500; }
+    .mock-track-meta { font-size: 10px; color: var(--text2); }
+    .mock-playbar {
+      border-top: 1px solid var(--border);
+      background: var(--bg3);
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .mock-pb-title { font-size: 11px; font-weight: 600; flex: 1; }
+    .mock-pb-sub { font-size: 10px; color: var(--text2); }
+    .mock-pb-track { display: flex; flex-direction: column; flex: 1; }
+    .mock-pb-bar {
+      flex: 2; height: 3px; background: var(--border); border-radius: 2px;
+      position: relative; overflow: visible;
+    }
+    .mock-pb-fill { width: 35%; height: 100%; background: var(--accent); border-radius: 2px; }
+    .mock-pb-btns { display: flex; gap: 6px; align-items: center; }
+    .mock-pb-play {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+    }
+    .mock-pb-ico { font-size: 13px; color: var(--text2); }
+
+    /* ============================================================
+       SECTIONS
+    ============================================================ */
+    section { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+      color: var(--text3); text-transform: uppercase; margin-bottom: 8px;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700; letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+    .section-sub { font-size: 15px; color: var(--text2); max-width: 500px; margin-bottom: 40px; }
+
+    /* Features grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 22px;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .feature-card:hover { border-color: rgba(37,99,235,0.3); transform: translateY(-2px); }
+    .feature-icon { font-size: 24px; margin-bottom: 12px; }
+    .feature-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .feature-desc { font-size: 13px; color: var(--text2); line-height: 1.55; }
+
+    /* Downloads */
+    .downloads-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .dl-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 22px;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: border-color 0.15s;
+    }
+    .dl-card:hover { border-color: rgba(37,99,235,0.3); }
+    .dl-card.beta { border-color: var(--beta-border); }
+    .dl-card.beta:hover { border-color: var(--beta); }
+    .dl-status {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      padding: 3px 9px; border-radius: 20px;
+      width: fit-content;
+    }
+    .dl-status.available { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); color: #22c55e; }
+    .dl-status.beta-status { background: var(--beta-bg); border: 1px solid var(--beta-border); color: var(--beta); }
+    .dl-status.soon { background: var(--bg3); border: 1px solid var(--border); color: var(--text3); }
+    .dl-name { font-size: 16px; font-weight: 700; }
+    .dl-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+    .dl-code {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 10px 12px;
+      color: var(--text2);
+      word-break: break-all;
+      line-height: 1.6;
+    }
+    .dl-code .cmd { color: var(--accent2); }
+    .dl-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      background: var(--accent); color: #fff;
+      transition: background 0.15s;
+      width: fit-content;
+    }
+    .dl-btn:hover { background: var(--accent2); }
+    .dl-btn.beta-btn { background: var(--beta); color: #000; }
+    .dl-btn.beta-btn:hover { background: #d97706; }
+    .dl-btn.disabled {
+      background: var(--bg3); color: var(--text3);
+      border: 1px solid var(--border); cursor: not-allowed;
+      pointer-events: none;
+    }
+    .beta-warning {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: var(--beta-bg); border: 1px solid var(--beta-border);
+      border-radius: 10px; padding: 14px 16px; margin-bottom: 32px;
+      font-size: 13px; color: var(--text2); line-height: 1.5;
+    }
+    .beta-warning .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .beta-warning strong { color: var(--beta); }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      text-align: center;
+      font-size: 13px; color: var(--text3);
+    }
+    footer a { color: var(--text2); transition: color 0.15s; }
+    footer a:hover { color: var(--accent); }
+    footer .sep { margin: 0 8px; }
+
+    /* ============================================================
+       ANIMATIONS
+    ============================================================ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero > * { animation: fadeUp 0.5s ease both; }
+    .hero > *:nth-child(1) { animation-delay: 0.05s; }
+    .hero > *:nth-child(2) { animation-delay: 0.1s; }
+    .hero > *:nth-child(3) { animation-delay: 0.15s; }
+    .hero > *:nth-child(4) { animation-delay: 0.2s; }
+    .hero > *:nth-child(5) { animation-delay: 0.25s; }
+    .hero > *:nth-child(6) { animation-delay: 0.3s; }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 600px) {
+      .mock-sidebar { display: none; }
+      .nav-links a:not(.github) { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .downloads-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="https://nebula-projectz.github.io/index.html"><span>NEBULA</span></a>
+    <span class="nav-sep">/</span>
+    <span class="nav-crumb">Nebula Vantage</span>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#downloads">Downloads</a>
+      <a href="https://github.com/VisorVP/nebula-vantage" class="github">GitHub</a>
+      <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀</button>
+    </div>
+  </nav>
+
+  <!-- BACK LINK -->
+  <div class="back-link">
+    <a href="https://nebula-projectz.github.io/index.html">← All apps</a>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">BETA — Unstable Build</div>
+    <div class="hero-type">🎵 Media Player</div>
+    <h1>Nebula Vantage</h1>
+    <div class="hero-meta">
+      <span class="beta-tag">v2.2.22-beta</span>
+      <span>GTK4</span>
+      <span>Python</span>
+      <span>Open Source</span>
+    </div>
+    <p class="hero-desc">
+      A modern media player for Linux. Audio &amp; video playback, smart playlists, custom image icons, and a clean dark/light interface. Currently in beta.
+    </p>
+    <div class="hero-ctas">
+      <a href="#downloads" class="btn-primary">⬇ Download Beta</a>
+      <a href="https://github.com/VisorVP/nebula-vantage" class="btn-secondary">View Source</a>
+    </div>
+  </div>
+
+  <!-- MOCK UI -->
+  <div class="mock-wrap">
+    <div class="mock-window">
+      <div class="mock-titlebar">
+        <div class="mock-dot r"></div>
+        <div class="mock-dot y"></div>
+        <div class="mock-dot g"></div>
+        <div class="mock-title">Nebula Vantage</div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-sidebar">
+          <div class="mock-sidebar-logo">
+            <div class="mock-logo-row">
+              <div class="mock-logo-v">V</div>
+              <div>
+                <div class="mock-logo-name">Nebula Vantage</div>
+                <div class="mock-logo-sub">MEDIA PLAYER</div>
+              </div>
+            </div>
+          </div>
+          <div class="mock-section">MEDIA</div>
+          <div class="mock-nav-item"><span class="ico">🎬</span> Videos</div>
+          <div class="mock-nav-item"><span class="ico">🎵</span> Music</div>
+          <div class="mock-section">LIBRARY</div>
+          <div class="mock-nav-item active"><span class="ico">☰</span> Playlists</div>
+          <div class="mock-nav-item" style="padding-left:28px; font-size:11px;">🎸 Rock Mix</div>
+          <div class="mock-nav-item" style="padding-left:28px; font-size:11px;">🔥 Favourites</div>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column;">
+          <div class="mock-content">
+            <div class="mock-content-title">Playlists</div>
+            <div class="mock-pl-card">
+              <div class="mock-pl-header">
+                <div class="mock-pl-icon">🎸</div>
+                <div>
+                  <div class="mock-pl-name">Rock Mix</div>
+                  <div class="mock-pl-count">12 tracks</div>
+                </div>
+                <div class="mock-pl-actions">
+                  <div class="mock-pl-btn sec">✏</div>
+                  <div class="mock-pl-btn">▶ Play</div>
+                </div>
+              </div>
+              <div class="mock-track">
+                <div class="mock-track-ico">🎵</div>
+                <div class="mock-track-info">
+                  <div class="mock-track-title">Bohemian Rhapsody</div>
+                  <div class="mock-track-meta">Queen · 5:55</div>
+                </div>
+                <div style="font-size:11px; color:var(--text3)">✏ ✕</div>
+              </div>
+              <div class="mock-track">
+                <div class="mock-track-ico">+</div>
+                <div class="mock-track-info">
+                  <div class="mock-track-title">Hotel California</div>
+                  <div class="mock-track-meta">Eagles · 6:31</div>
+                </div>
+                <div style="font-size:11px; color:var(--text3)">✏ ✕</div>
+              </div>
+            </div>
+          </div>
+          <div class="mock-playbar">
+            <div class="mock-pb-play">▶</div>
+            <div class="mock-pb-track">
+              <div class="mock-pb-title">Bohemian Rhapsody</div>
+              <div class="mock-pb-sub">Queen</div>
+            </div>
+            <div class="mock-pb-bar" style="flex:2; margin:0 10px;">
+              <div class="mock-pb-fill"></div>
+            </div>
+            <div style="font-size:10px; color:var(--text2)">2:02 / 5:55</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything you need</h2>
+    <p class="section-sub">Built from scratch with GTK4 and Python. No Electron, no bloat.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎵</div>
+        <div class="feature-name">Audio &amp; Video</div>
+        <div class="feature-desc">Plays MP3, FLAC, OGG, WAV, M4A, MP4, MKV, AVI and more via GStreamer.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <div class="feature-name">Smart Playlists</div>
+        <div class="feature-desc">Folder-based playlists stored locally. Portable — copy the folder to any machine.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖼</div>
+        <div class="feature-name">Custom Icons</div>
+        <div class="feature-desc">Set a PNG, JPG, or emoji as icon for any playlist or track. Stored locally.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✏️</div>
+        <div class="feature-name">Edit Metadata</div>
+        <div class="feature-desc">Pencil edit button on playlists and tracks — rename, change icon, update info.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌙</div>
+        <div class="feature-name">Dark &amp; Light Mode</div>
+        <div class="feature-desc">Instant toggle between dark and light themes. Preference saved automatically.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-name">Native Performance</div>
+        <div class="feature-desc">GTK4 + libadwaita. Hardware-accelerated, no web technology overhead.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOADS -->
+  <section id="downloads">
+    <div class="section-label">Downloads</div>
+    <h2 class="section-title">Get Nebula Vantage</h2>
+    <p class="section-sub">Free and open source. Currently available as a beta AppImage.</p>
+
+    <div class="beta-warning">
+      <span class="icon">⚠️</span>
+      <div>
+        <strong>Beta software — use at your own risk.</strong> This is an early, unstable build.
+        Features may be incomplete, broken, or change without notice. Feedback and bug reports are welcome on
+        <a href="https://github.com/VisorVP/nebula-vantage/issues" style="color:var(--beta)">GitHub Issues</a>.
+      </div>
+    </div>
+
+    <div class="downloads-grid">
+
+      <div class="dl-card beta">
+        <div class="dl-status beta-status">⚠ Beta</div>
+        <div class="dl-name">AppImage</div>
+        <div class="dl-desc">Portable — no installation needed. Download, make executable, and run.</div>
+        <div class="dl-code">
+          <span class="cmd">chmod +x</span> NebulaVantage-v2.2.22-beta-x86_64.AppImage<br>
+          ./NebulaVantage-v2.2.22-beta-x86_64.AppImage
+        </div>
+        <a href="https://github.com/VisorVP/nebula-vantage/releases" class="dl-btn beta-btn">⬇ Download Beta AppImage</a>
+      </div>
+
+      <div class="dl-card">
+        <div class="dl-status soon">Coming Soon</div>
+        <div class="dl-name">Flatpak</div>
+        <div class="dl-desc">Universal build for all Linux distros with Flatpak installed.</div>
+        <div class="dl-code">flatpak install flathub org.nebulaprojects.vantage</div>
+        <span class="dl-btn disabled">Not Available Yet</span>
+      </div>
+
+      <div class="dl-card">
+        <div class="dl-status soon">Coming Soon</div>
+        <div class="dl-name">Debian / Ubuntu</div>
+        <div class="dl-desc">For Ubuntu, Debian, AnduinOS and all .deb-based distros.</div>
+        <div class="dl-code">
+          <span class="cmd">sudo dpkg -i</span> nebula-vantage_*.deb<br>
+          <span class="cmd">sudo apt-get install -f</span>
+        </div>
+        <span class="dl-btn disabled">Not Available Yet</span>
+      </div>
+
+      <div class="dl-card">
+        <div class="dl-status soon">Coming Soon</div>
+        <div class="dl-name">Fedora / RHEL</div>
+        <div class="dl-desc">For Fedora, RHEL, Bazzite and all .rpm-based distros.</div>
+        <div class="dl-code"><span class="cmd">sudo dnf install</span> nebula-vantage_*.rpm</div>
+        <span class="dl-btn disabled">Not Available Yet</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    Made with care by <a href="https://github.com/VisorVP">Nebula Projects</a>
+    <span class="sep">·</span>
+    <a href="https://github.com/VisorVP/nebula-vantage">GitHub</a>
+    <span class="sep">·</span>
+    <a href="https://nebula-projectz.github.io/index.html">All Apps</a>
+  </footer>
+
+  <script>
+    // Theme toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+      document.querySelector('.theme-btn').textContent = current === 'dark' ? '🌙' : '☀';
+      localStorage.setItem('nv-theme', current === 'dark' ? 'light' : 'dark');
+    }
+    // Restore saved theme
+    const saved = localStorage.getItem('nv-theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      document.querySelector('.theme-btn').textContent = saved === 'dark' ? '☀' : '🌙';
+    }
+  </script>
+
+</body>
+</html>
