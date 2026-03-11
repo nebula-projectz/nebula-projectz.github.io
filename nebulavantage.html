@@ -1,688 +1,379 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nebula Vantage — A media player from the future</title>
-  <meta name="description" content="A modern GTK4 media player for Linux. Audio, video, playlists, custom icons, and more. Free and open source." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    /* ============================================================
-       VARIABLES & RESET
-    ============================================================ */
-    :root {
-      --bg: #0a0a0f;
-      --bg2: #111118;
-      --bg3: #18181f;
-      --border: rgba(255,255,255,0.07);
-      --text: #e8e8f0;
-      --text2: #8888a8;
-      --text3: #55556a;
-      --accent: #2563eb;
-      --accent2: #3b82f6;
-      --accent-glow: rgba(37,99,235,0.25);
-      --beta: #f59e0b;
-      --beta-bg: rgba(245,158,11,0.1);
-      --beta-border: rgba(245,158,11,0.3);
-      --card: #13131a;
-      --card-border: rgba(255,255,255,0.06);
-      --nav-h: 56px;
-      --radius: 12px;
-      --font-mono: 'Space Mono', monospace;
-      --font: 'DM Sans', sans-serif;
-    }
-    [data-theme="light"] {
-      --bg: #f4f4f8;
-      --bg2: #ffffff;
-      --bg3: #ebebf2;
-      --border: rgba(0,0,0,0.08);
-      --text: #18181f;
-      --text2: #55556a;
-      --text3: #9898b0;
-      --accent: #2563eb;
-      --accent2: #1d4ed8;
-      --accent-glow: rgba(37,99,235,0.12);
-      --beta: #d97706;
-      --beta-bg: rgba(245,158,11,0.08);
-      --beta-border: rgba(245,158,11,0.25);
-      --card: #ffffff;
-      --card-border: rgba(0,0,0,0.07);
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      font-size: 15px;
-      transition: background 0.3s, color 0.3s;
-    }
-    a { color: inherit; text-decoration: none; }
-    code {
-      font-family: var(--font-mono);
-      font-size: 0.82em;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      padding: 2px 7px;
-      border-radius: 5px;
-      color: var(--accent2);
-    }
-
-    /* ============================================================
-       NAV
-    ============================================================ */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      height: var(--nav-h);
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center;
-      padding: 0 24px; gap: 8px;
-      backdrop-filter: blur(12px);
-    }
-    .nav-logo {
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      color: var(--text);
-      margin-right: 8px;
-    }
-    .nav-logo span { color: var(--accent); }
-    .nav-sep { color: var(--text3); margin: 0 4px; }
-    .nav-crumb { color: var(--text2); font-size: 13px; }
-    .nav-links { display: flex; gap: 4px; margin-left: auto; align-items: center; }
-    .nav-links a {
-      padding: 6px 12px; border-radius: 8px;
-      font-size: 13px; font-weight: 500; color: var(--text2);
-      transition: background 0.15s, color 0.15s;
-    }
-    .nav-links a:hover { background: var(--bg3); color: var(--text); }
-    .nav-links a.github {
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text);
-    }
-    .nav-links a.github:hover { border-color: var(--accent); color: var(--accent); }
-    .theme-btn {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: var(--bg3); border: 1px solid var(--border);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-size: 14px; margin-left: 4px; transition: border-color 0.15s;
-      color: var(--text2);
-    }
-    .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* ============================================================
-       HERO
-    ============================================================ */
-    .back-link {
-      display: inline-flex; align-items: center; gap-6px;
-      padding: 40px 0 0 0;
-      margin: 0 auto;
-      max-width: 900px;
-      width: 100%;
-      padding-left: 24px;
-    }
-    .back-link a {
-      font-size: 13px; color: var(--text2);
-      display: flex; align-items: center; gap: 5px;
-      transition: color 0.15s;
-    }
-    .back-link a:hover { color: var(--accent); }
-
-    .hero {
-      max-width: 900px; margin: 0 auto;
-      padding: 32px 24px 64px;
-    }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--beta-bg); border: 1px solid var(--beta-border);
-      color: var(--beta); border-radius: 20px;
-      padding: 4px 12px; font-size: 12px; font-weight: 600;
-      margin-bottom: 20px; letter-spacing: 0.04em;
-    }
-    .hero-badge::before { content: "⚠"; font-size: 11px; }
-    .hero-type {
-      font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
-      color: var(--accent); text-transform: uppercase;
-      margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
-    }
-    .hero h1 {
-      font-size: clamp(2.4rem, 5vw, 3.8rem);
-      font-weight: 700; line-height: 1.1;
-      letter-spacing: -0.02em; margin-bottom: 16px;
-    }
-    .hero-meta {
-      font-size: 13px; color: var(--text2); margin-bottom: 20px;
-      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-    }
-    .hero-meta span {
-      background: var(--bg3); border: 1px solid var(--border);
-      padding: 3px 10px; border-radius: 20px;
-    }
-    .hero-meta .beta-tag {
-      background: var(--beta-bg); border-color: var(--beta-border);
-      color: var(--beta);
-    }
-    .hero-desc {
-      font-size: 17px; color: var(--text2); max-width: 560px;
-      line-height: 1.65; margin-bottom: 32px;
-    }
-    .hero-ctas { display: flex; gap: 10px; flex-wrap: wrap; }
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: var(--accent); color: #fff;
-      padding: 10px 22px; border-radius: 10px;
-      font-size: 14px; font-weight: 600;
-      transition: background 0.15s, transform 0.1s;
-      border: none; cursor: pointer;
-    }
-    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
-    .btn-secondary {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: var(--bg3); color: var(--text);
-      padding: 10px 22px; border-radius: 10px;
-      font-size: 14px; font-weight: 500;
-      border: 1px solid var(--border);
-      transition: border-color 0.15s, transform 0.1s;
-    }
-    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
-
-    /* ============================================================
-       MOCK UI
-    ============================================================ */
-    .mock-wrap {
-      max-width: 900px; margin: 0 auto; padding: 0 24px 80px;
-    }
-    .mock-window {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.4);
-    }
-    .mock-titlebar {
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 16px;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .mock-dot.r { background: #ff5f57; }
-    .mock-dot.y { background: #ffbd2e; }
-    .mock-dot.g { background: #28c840; }
-    .mock-title {
-      flex: 1; text-align: center;
-      font-size: 12px; font-weight: 600; color: var(--text2);
-    }
-    .mock-body {
-      display: flex; height: 320px;
-    }
-    .mock-sidebar {
-      width: 180px; min-width: 180px;
-      background: var(--bg3);
-      border-right: 1px solid var(--border);
-      padding: 12px 0;
-    }
-    .mock-sidebar-logo {
-      padding: 4px 14px 14px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 8px;
-    }
-    .mock-logo-row { display: flex; align-items: center; gap: 6px; }
-    .mock-logo-v {
-      font-family: var(--font-mono);
-      font-weight: 700; font-size: 16px;
-      color: var(--accent);
-    }
-    .mock-logo-name { font-size: 12px; font-weight: 600; color: var(--text); }
-    .mock-logo-sub { font-size: 9px; color: var(--text3); letter-spacing: 0.1em; margin-top: 1px; }
-    .mock-section { padding: 6px 14px 2px; font-size: 9px; font-weight: 700; color: var(--text3); letter-spacing: 0.1em; }
-    .mock-nav-item {
-      padding: 6px 14px; font-size: 12px; color: var(--text2);
-      display: flex; align-items: center; gap: 7px;
-      border-radius: 6px; margin: 0 6px;
-      transition: background 0.1s;
-    }
-    .mock-nav-item.active { background: rgba(37,99,235,0.15); color: var(--accent); font-weight: 600; }
-    .mock-nav-item .ico { font-size: 13px; }
-    .mock-content { flex: 1; padding: 16px; overflow: hidden; }
-    .mock-content-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
-    .mock-pl-card {
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: 10px; padding: 12px; margin-bottom: 8px;
-    }
-    .mock-pl-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .mock-pl-icon {
-      width: 40px; height: 40px; border-radius: 8px;
-      background: linear-gradient(135deg, #1e3a8a, #2563eb);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; flex-shrink: 0;
-    }
-    .mock-pl-name { font-size: 13px; font-weight: 600; }
-    .mock-pl-count { font-size: 11px; color: var(--text2); }
-    .mock-pl-actions { display: flex; gap: 5px; margin-left: auto; }
-    .mock-pl-btn {
-      padding: 3px 8px; border-radius: 5px; font-size: 11px;
-      background: var(--accent); color: #fff; font-weight: 500;
-    }
-    .mock-pl-btn.sec { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); }
-    .mock-track {
-      display: flex; align-items: center; gap: 8px;
-      padding: 5px 0; border-top: 1px solid var(--border);
-      font-size: 11px;
-    }
-    .mock-track-ico {
-      width: 24px; height: 24px; border-radius: 5px;
-      background: var(--bg2); border: 1px dashed var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; flex-shrink: 0;
-    }
-    .mock-track-info { flex: 1; }
-    .mock-track-title { font-size: 11px; font-weight: 500; }
-    .mock-track-meta { font-size: 10px; color: var(--text2); }
-    .mock-playbar {
-      border-top: 1px solid var(--border);
-      background: var(--bg3);
-      padding: 10px 16px;
-      display: flex; align-items: center; gap: 12px;
-    }
-    .mock-pb-title { font-size: 11px; font-weight: 600; flex: 1; }
-    .mock-pb-sub { font-size: 10px; color: var(--text2); }
-    .mock-pb-track { display: flex; flex-direction: column; flex: 1; }
-    .mock-pb-bar {
-      flex: 2; height: 3px; background: var(--border); border-radius: 2px;
-      position: relative; overflow: visible;
-    }
-    .mock-pb-fill { width: 35%; height: 100%; background: var(--accent); border-radius: 2px; }
-    .mock-pb-btns { display: flex; gap: 6px; align-items: center; }
-    .mock-pb-play {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: var(--accent); color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px;
-    }
-    .mock-pb-ico { font-size: 13px; color: var(--text2); }
-
-    /* ============================================================
-       SECTIONS
-    ============================================================ */
-    section { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
-    .section-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
-      color: var(--text3); text-transform: uppercase; margin-bottom: 8px;
-    }
-    .section-title {
-      font-size: clamp(1.6rem, 3vw, 2.2rem);
-      font-weight: 700; letter-spacing: -0.01em;
-      margin-bottom: 10px;
-    }
-    .section-sub { font-size: 15px; color: var(--text2); max-width: 500px; margin-bottom: 40px; }
-
-    /* Features grid */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 16px;
-    }
-    .feature-card {
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 22px;
-      transition: border-color 0.15s, transform 0.15s;
-    }
-    .feature-card:hover { border-color: rgba(37,99,235,0.3); transform: translateY(-2px); }
-    .feature-icon { font-size: 24px; margin-bottom: 12px; }
-    .feature-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
-    .feature-desc { font-size: 13px; color: var(--text2); line-height: 1.55; }
-
-    /* Downloads */
-    .downloads-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
-    }
-    .dl-card {
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 22px;
-      display: flex; flex-direction: column; gap: 12px;
-      transition: border-color 0.15s;
-    }
-    .dl-card:hover { border-color: rgba(37,99,235,0.3); }
-    .dl-card.beta { border-color: var(--beta-border); }
-    .dl-card.beta:hover { border-color: var(--beta); }
-    .dl-status {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
-      padding: 3px 9px; border-radius: 20px;
-      width: fit-content;
-    }
-    .dl-status.available { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); color: #22c55e; }
-    .dl-status.beta-status { background: var(--beta-bg); border: 1px solid var(--beta-border); color: var(--beta); }
-    .dl-status.soon { background: var(--bg3); border: 1px solid var(--border); color: var(--text3); }
-    .dl-name { font-size: 16px; font-weight: 700; }
-    .dl-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
-    .dl-code {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 10px 12px;
-      color: var(--text2);
-      word-break: break-all;
-      line-height: 1.6;
-    }
-    .dl-code .cmd { color: var(--accent2); }
-    .dl-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 9px 16px; border-radius: 8px;
-      font-size: 13px; font-weight: 600;
-      background: var(--accent); color: #fff;
-      transition: background 0.15s;
-      width: fit-content;
-    }
-    .dl-btn:hover { background: var(--accent2); }
-    .dl-btn.beta-btn { background: var(--beta); color: #000; }
-    .dl-btn.beta-btn:hover { background: #d97706; }
-    .dl-btn.disabled {
-      background: var(--bg3); color: var(--text3);
-      border: 1px solid var(--border); cursor: not-allowed;
-      pointer-events: none;
-    }
-    .beta-warning {
-      display: flex; align-items: flex-start; gap: 10px;
-      background: var(--beta-bg); border: 1px solid var(--beta-border);
-      border-radius: 10px; padding: 14px 16px; margin-bottom: 32px;
-      font-size: 13px; color: var(--text2); line-height: 1.5;
-    }
-    .beta-warning .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
-    .beta-warning strong { color: var(--beta); }
-
-    /* ============================================================
-       FOOTER
-    ============================================================ */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 28px 24px;
-      text-align: center;
-      font-size: 13px; color: var(--text3);
-    }
-    footer a { color: var(--text2); transition: color 0.15s; }
-    footer a:hover { color: var(--accent); }
-    footer .sep { margin: 0 8px; }
-
-    /* ============================================================
-       ANIMATIONS
-    ============================================================ */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .hero > * { animation: fadeUp 0.5s ease both; }
-    .hero > *:nth-child(1) { animation-delay: 0.05s; }
-    .hero > *:nth-child(2) { animation-delay: 0.1s; }
-    .hero > *:nth-child(3) { animation-delay: 0.15s; }
-    .hero > *:nth-child(4) { animation-delay: 0.2s; }
-    .hero > *:nth-child(5) { animation-delay: 0.25s; }
-    .hero > *:nth-child(6) { animation-delay: 0.3s; }
-
-    /* ============================================================
-       RESPONSIVE
-    ============================================================ */
-    @media (max-width: 600px) {
-      .mock-sidebar { display: none; }
-      .nav-links a:not(.github) { display: none; }
-      .features-grid { grid-template-columns: 1fr; }
-      .downloads-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nebula Vantage — A media player from the future</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+[data-theme="dark"]{--bg:#020810;--surface:#0a1628;--surface2:#0f1e35;--border:rgba(6,182,212,0.12);--border2:rgba(6,182,212,0.22);--accent:#06b6d4;--accent2:#3b82f6;--text:#e2f4f8;--text2:#7eb8c9;--text3:#3a6b7a;--code-bg:#030d1a;--code-text:#67e8f9;--success:#10b981;--warning:#f59e0b;--shadow:0 25px 60px rgba(0,0,0,0.7);}
+[data-theme="light"]{--bg:#f0f9ff;--surface:#ffffff;--surface2:#e0f2fe;--border:rgba(6,182,212,0.18);--border2:rgba(6,182,212,0.3);--accent:#0891b2;--accent2:#2563eb;--text:#0c2340;--text2:#1e6080;--text3:#7eb8c9;--code-bg:#0f2030;--code-text:#67e8f9;--success:#059669;--warning:#d97706;--shadow:0 25px 60px rgba(0,0,0,0.12);}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;transition:background .4s,color .4s;}
+#bg-canvas{position:fixed;inset:0;z-index:1;pointer-events:none;}
+.mesh-blob{position:fixed;pointer-events:none;z-index:2;border-radius:50%;filter:blur(80px);opacity:0.18;}
+.blob1{width:700px;height:700px;background:radial-gradient(circle,#06b6d4,transparent 70%);top:-150px;left:-100px;animation:bm1 18s ease-in-out infinite;}
+.blob2{width:600px;height:600px;background:radial-gradient(circle,#3b82f6,transparent 70%);bottom:-100px;right:-100px;animation:bm2 22s ease-in-out infinite;}
+.blob3{width:450px;height:450px;background:radial-gradient(circle,#0891b2,transparent 70%);top:40%;left:40%;animation:bm3 15s ease-in-out infinite;}
+@keyframes bm1{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(120px,80px) scale(1.1);}66%{transform:translate(-60px,140px) scale(0.9);}}
+@keyframes bm2{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(-100px,-60px) scale(1.15);}66%{transform:translate(80px,-120px) scale(0.95);}}
+@keyframes bm3{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-80px,60px) scale(1.2);}}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;padding:0 48px;display:flex;align-items:center;justify-content:space-between;background:color-mix(in srgb,var(--bg) 60%,transparent);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+.nav-left{display:flex;align-items:center;gap:20px;}
+.nav-logo{font-family:'Space Mono',monospace;font-weight:700;font-size:15px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;}
+.nav-sep{color:var(--text3);}.nav-page{font-size:13px;color:var(--text2);font-weight:500;}
+.nav-right{display:flex;align-items:center;gap:6px;}
+.nav-link{color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;padding:6px 12px;border-radius:7px;transition:all .15s;}
+.nav-link:hover{color:var(--text);background:rgba(6,182,212,0.08);}
+.settings-wrap{position:relative;}
+.settings-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-size:15px;transition:all .15s;}
+.settings-btn:hover{border-color:var(--accent);color:var(--accent);}
+.settings-panel{position:absolute;top:42px;right:0;width:250px;background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:16px;box-shadow:var(--shadow);display:none;flex-direction:column;gap:14px;z-index:300;}
+.settings-panel.open{display:flex;}
+.settings-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding-bottom:10px;border-bottom:1px solid var(--border);}
+.setting-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;}
+.setting-row>span{font-weight:500;color:var(--text);}
+.toggle{position:relative;width:40px;height:22px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;inset:0;border-radius:11px;background:var(--surface2);border:1px solid var(--border2);transition:background .2s;}
+.toggle input:checked+.toggle-track{background:var(--accent);border-color:var(--accent);}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.toggle input:checked~.toggle-thumb{transform:translateX(18px);}
+.hero{padding:100px 48px 70px;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;}
+.hero-back{display:inline-flex;align-items:center;gap:5px;color:var(--text3);text-decoration:none;font-size:12px;font-weight:500;margin-bottom:18px;transition:color .15s;}
+.hero-back:hover{color:var(--accent);}
+.hero-title-row{display:flex;align-items:center;gap:20px;margin-bottom:14px;}
+.hero-app-icon{width:90px;height:90px;flex-shrink:0;filter:drop-shadow(0 8px 24px rgba(6,182,212,0.25));}
+.hero h1{font-family:'Space Mono',monospace;font-weight:700;font-size:clamp(26px,3.5vw,48px);line-height:1.05;letter-spacing:-1.5px;background:linear-gradient(135deg,#e2f4f8 0%,#22d3ee 50%,#3b82f6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;}
+.hero-tag{font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);border:1px solid var(--border2);border-radius:5px;padding:3px 9px;}
+.hero-tag.beta{color:var(--warning);border-color:rgba(245,158,11,0.35);background:rgba(245,158,11,0.07);}
+.hero p{font-size:15px;color:var(--text2);line-height:1.75;margin-bottom:28px;}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.btn-p{padding:10px 22px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:7px;border:none;}
+.btn-p:hover{filter:brightness(1.15);transform:translateY(-1px);box-shadow:0 8px 25px rgba(6,182,212,0.3);}
+.btn-o{padding:10px 22px;background:transparent;color:var(--text);border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;border:1px solid var(--border2);transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+.btn-o:hover{border-color:var(--accent);color:var(--accent);}
+.mockup{position:relative;z-index:3;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px rgba(6,182,212,0.25),0 30px 80px rgba(0,0,0,0.6),0 0 60px rgba(6,182,212,0.06);}
+.mbar{background:rgba(2,8,18,0.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:9px 14px;display:flex;align-items:center;gap:7px;border-bottom:1px solid rgba(6,182,212,0.15);}
+[data-theme="light"] .mockup{box-shadow:0 0 0 1px rgba(6,182,212,0.3),0 30px 80px rgba(0,0,0,0.2);}
+[data-theme="light"] .mbar{background:rgba(255,255,255,0.7);}
+.md{width:10px;height:10px;border-radius:50%;}.md.r{background:#ff5f57;}.md.y{background:#febc2e;}.md.g{background:#28c840;}
+.mtitle{flex:1;text-align:center;font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;}
+.mbody{display:flex;height:280px;}
+.mv-sidebar{width:150px;background:rgba(2,8,20,0.82);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding:10px 0;border-right:1px solid rgba(6,182,212,0.12);display:flex;flex-direction:column;}
+[data-theme="light"] .mv-sidebar{background:rgba(200,230,255,0.65);}
+.mv-logo{display:flex;align-items:center;gap:7px;padding:8px 10px 10px;border-bottom:1px solid rgba(6,182,212,0.1);margin-bottom:6px;}
+.mv-logo-icon{width:20px;height:20px;flex-shrink:0;}
+.mv-logo-text{font-family:'Space Mono',monospace;font-size:8px;color:var(--text2);font-weight:700;line-height:1.2;}
+.mv-logo-sub{font-size:7px;color:var(--text3);font-family:'Space Mono',monospace;letter-spacing:.5px;}
+.mv-section{font-size:7px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;padding:4px 10px 2px;font-weight:700;}
+.mv-item{display:flex;align-items:center;gap:7px;padding:5px 10px;font-size:9px;color:var(--text3);transition:all .1s;}
+.mv-item.active{background:rgba(6,182,212,0.18);color:var(--accent);}
+.mv-item svg{width:10px;height:10px;flex-shrink:0;opacity:.6;}.mv-item.active svg{opacity:1;}
+.mv-pl-item{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 16px;font-size:8px;color:var(--text3);}
+.mv-main{flex:1;background:rgba(1,5,14,0.72);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);display:flex;flex-direction:column;overflow:hidden;}
+[data-theme="light"] .mv-main{background:rgba(180,220,255,0.4);}
+.mv-main-title{font-size:11px;font-weight:600;color:var(--text);padding:10px 14px 6px;font-family:'Space Mono',monospace;letter-spacing:-.3px;}
+.mv-pl-card{display:flex;align-items:center;gap:10px;padding:7px 14px;border-bottom:1px solid rgba(6,182,212,0.07);}
+.mv-pl-thumb{width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.mv-pl-info{flex:1;}.mv-pl-name{font-size:9px;font-weight:600;color:var(--text);}.mv-pl-count{font-size:8px;color:var(--text3);}
+.mv-pl-play{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:5px;color:white;font-size:8px;font-weight:700;padding:3px 8px;cursor:default;display:flex;align-items:center;gap:3px;}
+.mv-track{display:flex;align-items:center;gap:10px;padding:5px 14px;border-bottom:1px solid rgba(6,182,212,0.05);}
+.mv-track-icon{width:22px;height:22px;border-radius:5px;background:rgba(6,182,212,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mv-track-icon svg{width:10px;height:10px;}
+.mv-track-name{font-size:9px;color:var(--text);font-weight:500;}.mv-track-artist{font-size:8px;color:var(--text3);}
+.mv-playbar{background:rgba(0,5,15,0.7);border-top:1px solid rgba(6,182,212,0.1);padding:7px 14px;margin-top:auto;}
+.mv-pb-info{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.mv-pb-btn{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mv-pb-btn svg{width:8px;height:8px;}
+.mv-pb-track{font-size:9px;font-weight:600;color:var(--text);}.mv-pb-artist{font-size:8px;color:var(--text3);}
+.mv-pb-time{font-size:8px;color:var(--text3);margin-left:auto;font-family:'Space Mono',monospace;}
+.mv-progress{height:3px;background:rgba(6,182,212,0.15);border-radius:2px;overflow:hidden;}
+.mv-progress-fill{height:100%;width:38%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;}
+.sec{padding:64px 48px;max-width:1100px;margin:0 auto;position:relative;}
+.eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;font-weight:700;}
+.sec-title{font-family:'Space Mono',monospace;font-weight:700;font-size:clamp(20px,3vw,30px);letter-spacing:-1px;margin-bottom:8px;color:var(--text);}
+.sec-sub{font-size:15px;color:var(--text2);line-height:1.6;margin-bottom:40px;}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.fc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;transition:all .2s;backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);}
+.fc:hover{border-color:rgba(6,182,212,0.38);transform:translateY(-2px);box-shadow:0 8px 30px rgba(6,182,212,0.1);background:var(--surface2);}
+.fi{width:40px;height:40px;border-radius:10px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.18);display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.fi svg{width:20px;height:20px;}.fc h3{font-size:13px;font-weight:600;margin-bottom:5px;color:var(--text);}.fc p{font-size:12px;color:var(--text2);line-height:1.6;}
+.dl-list{display:flex;flex-direction:column;gap:10px;}
+.dl-row{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 22px;display:grid;grid-template-columns:48px 1fr auto;gap:16px;align-items:center;transition:all .2s;}
+.dl-row:hover:not(.soon){border-color:rgba(6,182,212,0.35);box-shadow:0 4px 20px rgba(6,182,212,0.08);}
+.dl-row.soon{opacity:.5;}
+.dl-icon{width:48px;height:48px;border-radius:10px;background:rgba(6,182,212,0.07);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dl-icon svg{width:26px;height:26px;}
+.dl-info h3{font-size:14px;font-weight:600;margin-bottom:3px;color:var(--text);display:flex;align-items:center;gap:8px;}
+.dl-info p{font-size:12px;color:var(--text2);margin-bottom:7px;}
+.dl-cmd{display:flex;align-items:center;gap:8px;background:var(--code-bg);border-radius:6px;padding:6px 10px;font-family:'Space Mono',monospace;font-size:11px;color:var(--code-text);border:1px solid rgba(6,182,212,0.1);overflow-x:auto;}
+.cp{background:none;border:none;cursor:pointer;color:var(--text3);padding:2px 4px;border-radius:4px;font-size:12px;flex-shrink:0;transition:color .15s;}
+.cp:hover{color:var(--accent);}
+.dl-acts{display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;}
+.dl-btn{padding:8px 18px;border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;transition:all .2s;white-space:nowrap;text-align:center;}
+.dl-btn.av{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;}
+.dl-btn.av:hover{filter:brightness(1.15);box-shadow:0 4px 15px rgba(6,182,212,0.3);}
+.dl-btn.na{background:var(--surface2);color:var(--text3);border:1px solid var(--border);cursor:not-allowed;font-size:11px;}
+.badge{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 8px;border-radius:4px;}
+.b-ok{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.25);}
+.b-soon{background:rgba(245,158,11,.15);color:var(--warning);border:1px solid rgba(245,158,11,.25);}
+.b-pend{background:rgba(6,182,212,.15);color:var(--accent);border:1px solid rgba(6,182,212,.25);}
+footer{border-top:1px solid var(--border);padding:28px 48px;text-align:center;color:var(--text3);font-size:12px;position:relative;z-index:1;margin-top:32px;}
+footer a{color:var(--accent);text-decoration:none;}
+.theme-pill{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:500;display:flex;align-items:center;gap:2px;background:color-mix(in srgb,var(--surface) 70%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border2);border-radius:50px;padding:5px;box-shadow:0 8px 32px rgba(0,0,0,0.4),0 0 0 1px rgba(255,255,255,0.04);transition:all .3s;}
+.theme-pill:hover{box-shadow:0 12px 40px rgba(6,182,212,0.2),0 0 0 1px rgba(6,182,212,0.15);}
+.pill-btn{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:40px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;background:transparent;color:var(--text3);transition:all .2s;}
+.pill-btn.active{background:var(--accent);color:white;box-shadow:0 2px 12px rgba(6,182,212,0.4);}
+.pill-btn:not(.active):hover{color:var(--text);background:rgba(255,255,255,0.05);}
+.pill-sep{width:1px;height:20px;background:var(--border2);margin:0 2px;}
+.pill-collapse{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s;margin-left:2px;flex-shrink:0;}
+.pill-collapse:hover{color:var(--accent);background:rgba(6,182,212,0.1);}
+.pill-collapse svg{transition:transform .3s;}.pill-collapse.collapsed svg{transform:rotate(180deg);}
+.pill-inner{display:flex;align-items:center;gap:2px;overflow:hidden;max-width:200px;transition:max-width .35s ease,opacity .3s ease;opacity:1;}
+.pill-inner.hidden{max-width:0;opacity:0;pointer-events:none;}
+@media(max-width:800px){nav{padding:0 18px;}.hero{grid-template-columns:1fr;padding:85px 18px 50px;gap:36px;}.sec{padding:48px 18px;}.feat-grid{grid-template-columns:1fr;}.dl-row{grid-template-columns:48px 1fr;}.dl-acts{grid-column:1/-1;flex-direction:row;}footer{padding:22px 18px;}}
+</style>
 </head>
 <body>
+<canvas id="bg-canvas"></canvas>
+<div class="mesh-blob blob1"></div>
+<div class="mesh-blob blob2"></div>
+<div class="mesh-blob blob3"></div>
 
-  <!-- NAV -->
-  <nav>
-    <a class="nav-logo" href="https://nebula-projectz.github.io/index.html"><span>NEBULA</span></a>
+<nav>
+  <div class="nav-left">
+    <a href="index.html" class="nav-logo">NEBULA</a>
     <span class="nav-sep">/</span>
-    <span class="nav-crumb">Nebula Vantage</span>
-    <div class="nav-links">
-      <a href="#features">Features</a>
-      <a href="#downloads">Downloads</a>
-      <a href="https://github.com/VisorVP/nebula-vantage" class="github">GitHub</a>
-      <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀</button>
-    </div>
-  </nav>
-
-  <!-- BACK LINK -->
-  <div class="back-link">
-    <a href="https://nebula-projectz.github.io/index.html">← All apps</a>
+    <span class="nav-page">Nebula Vantage</span>
   </div>
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-badge">BETA — Unstable Build</div>
-    <div class="hero-type">🎵 Media Player</div>
-    <h1>Nebula Vantage</h1>
-    <div class="hero-meta">
-      <span class="beta-tag">v2.2.22-beta</span>
-      <span>GTK4</span>
-      <span>Python</span>
-      <span>Open Source</span>
-    </div>
-    <p class="hero-desc">
-      A modern media player for Linux. Audio &amp; video playback, smart playlists, custom image icons, and a clean dark/light interface. Currently in beta.
-    </p>
-    <div class="hero-ctas">
-      <a href="#downloads" class="btn-primary">⬇ Download Beta</a>
-      <a href="https://github.com/VisorVP/nebula-vantage" class="btn-secondary">View Source</a>
-    </div>
-  </div>
-
-  <!-- MOCK UI -->
-  <div class="mock-wrap">
-    <div class="mock-window">
-      <div class="mock-titlebar">
-        <div class="mock-dot r"></div>
-        <div class="mock-dot y"></div>
-        <div class="mock-dot g"></div>
-        <div class="mock-title">Nebula Vantage</div>
-      </div>
-      <div class="mock-body">
-        <div class="mock-sidebar">
-          <div class="mock-sidebar-logo">
-            <div class="mock-logo-row">
-              <div class="mock-logo-v">V</div>
-              <div>
-                <div class="mock-logo-name">Nebula Vantage</div>
-                <div class="mock-logo-sub">MEDIA PLAYER</div>
-              </div>
-            </div>
-          </div>
-          <div class="mock-section">MEDIA</div>
-          <div class="mock-nav-item"><span class="ico">🎬</span> Videos</div>
-          <div class="mock-nav-item"><span class="ico">🎵</span> Music</div>
-          <div class="mock-section">LIBRARY</div>
-          <div class="mock-nav-item active"><span class="ico">☰</span> Playlists</div>
-          <div class="mock-nav-item" style="padding-left:28px; font-size:11px;">🎸 Rock Mix</div>
-          <div class="mock-nav-item" style="padding-left:28px; font-size:11px;">🔥 Favourites</div>
-        </div>
-        <div style="flex:1; display:flex; flex-direction:column;">
-          <div class="mock-content">
-            <div class="mock-content-title">Playlists</div>
-            <div class="mock-pl-card">
-              <div class="mock-pl-header">
-                <div class="mock-pl-icon">🎸</div>
-                <div>
-                  <div class="mock-pl-name">Rock Mix</div>
-                  <div class="mock-pl-count">12 tracks</div>
-                </div>
-                <div class="mock-pl-actions">
-                  <div class="mock-pl-btn sec">✏</div>
-                  <div class="mock-pl-btn">▶ Play</div>
-                </div>
-              </div>
-              <div class="mock-track">
-                <div class="mock-track-ico">🎵</div>
-                <div class="mock-track-info">
-                  <div class="mock-track-title">Bohemian Rhapsody</div>
-                  <div class="mock-track-meta">Queen · 5:55</div>
-                </div>
-                <div style="font-size:11px; color:var(--text3)">✏ ✕</div>
-              </div>
-              <div class="mock-track">
-                <div class="mock-track-ico">+</div>
-                <div class="mock-track-info">
-                  <div class="mock-track-title">Hotel California</div>
-                  <div class="mock-track-meta">Eagles · 6:31</div>
-                </div>
-                <div style="font-size:11px; color:var(--text3)">✏ ✕</div>
-              </div>
-            </div>
-          </div>
-          <div class="mock-playbar">
-            <div class="mock-pb-play">▶</div>
-            <div class="mock-pb-track">
-              <div class="mock-pb-title">Bohemian Rhapsody</div>
-              <div class="mock-pb-sub">Queen</div>
-            </div>
-            <div class="mock-pb-bar" style="flex:2; margin:0 10px;">
-              <div class="mock-pb-fill"></div>
-            </div>
-            <div style="font-size:10px; color:var(--text2)">2:02 / 5:55</div>
-          </div>
-        </div>
+  <div class="nav-right">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#downloads" class="nav-link">Downloads</a>
+    <a href="https://github.com/VisorVP/nebula-vantage" target="_blank" class="nav-link">GitHub</a>
+    <div class="settings-wrap">
+      <button class="settings-btn" onclick="toggleSettings()" title="Settings">⚙</button>
+      <div class="settings-panel" id="sp">
+        <div class="settings-title">Preferences</div>
+        <div class="setting-row"><span>Dark Mode</span><label class="toggle"><input type="checkbox" id="darkT" checked onchange="setTheme(this)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+        <div class="setting-row"><span>Show Commands</span><label class="toggle"><input type="checkbox" id="cmdT" checked onchange="showCmds(this)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+        <div class="setting-row"><span>Animations</span><label class="toggle"><input type="checkbox" id="animT" checked onchange="toggleAnim(this)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
       </div>
     </div>
   </div>
+</nav>
 
-  <!-- FEATURES -->
-  <section id="features">
-    <div class="section-label">Features</div>
-    <h2 class="section-title">Everything you need</h2>
-    <p class="section-sub">Built from scratch with GTK4 and Python. No Electron, no bloat.</p>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🎵</div>
-        <div class="feature-name">Audio &amp; Video</div>
-        <div class="feature-desc">Plays MP3, FLAC, OGG, WAV, M4A, MP4, MKV, AVI and more via GStreamer.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📋</div>
-        <div class="feature-name">Smart Playlists</div>
-        <div class="feature-desc">Folder-based playlists stored locally. Portable — copy the folder to any machine.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🖼</div>
-        <div class="feature-name">Custom Icons</div>
-        <div class="feature-desc">Set a PNG, JPG, or emoji as icon for any playlist or track. Stored locally.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">✏️</div>
-        <div class="feature-name">Edit Metadata</div>
-        <div class="feature-desc">Pencil edit button on playlists and tracks — rename, change icon, update info.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🌙</div>
-        <div class="feature-name">Dark &amp; Light Mode</div>
-        <div class="feature-desc">Instant toggle between dark and light themes. Preference saved automatically.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <div class="feature-name">Native Performance</div>
-        <div class="feature-desc">GTK4 + libadwaita. Hardware-accelerated, no web technology overhead.</div>
-      </div>
+<main>
+<section class="hero">
+  <div>
+    <a href="index.html" class="hero-back">← All apps</a>
+    <div class="hero-title-row">
+      <!-- Clapperboard icon -->
+      <svg class="hero-app-icon" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="nvbg" cx="30%" cy="30%" r="80%"><stop offset="0%" stop-color="#0f2040"/><stop offset="100%" stop-color="#020810"/></radialGradient>
+          <linearGradient id="nvvg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#2563eb"/></linearGradient>
+          <linearGradient id="nvboard" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#1c1c22"/><stop offset="100%" stop-color="#0e0e12"/></linearGradient>
+          <linearGradient id="nvarm" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#252530"/><stop offset="100%" stop-color="#16161e"/></linearGradient>
+          <filter id="nvglow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <clipPath id="nvbc"><rect x="18" y="52" width="84" height="54" rx="5"/></clipPath>
+          <clipPath id="nvac"><rect x="18" y="38" width="84" height="14"/></clipPath>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#nvbg)"/>
+        <circle cx="14" cy="16" r="0.9" fill="white" opacity="0.45"/>
+        <circle cx="100" cy="12" r="1" fill="white" opacity="0.35"/>
+        <circle cx="109" cy="52" r="0.7" fill="#22d3ee" opacity="0.5"/>
+        <circle cx="9" cy="98" r="0.8" fill="white" opacity="0.3"/>
+        <circle cx="105" cy="105" r="0.7" fill="#93c5fd" opacity="0.35"/>
+        <circle cx="92" cy="28" r="0.5" fill="#22d3ee" opacity="0.3"/>
+        <rect x="18" y="52" width="84" height="54" rx="5" fill="url(#nvboard)"/>
+        <rect x="19" y="53" width="82" height="2" rx="1" fill="white" opacity="0.05"/>
+        <rect x="18" y="52" width="84" height="54" rx="5" fill="none" stroke="rgba(6,182,212,0.3)" stroke-width="0.8"/>
+        <g clip-path="url(#nvbc)">
+          <rect x="18" y="52" width="84" height="12" fill="#131318"/>
+          <rect x="32" y="53" width="1" height="10" fill="rgba(255,255,255,0.07)"/>
+          <rect x="46" y="53" width="1" height="10" fill="rgba(255,255,255,0.07)"/>
+          <rect x="60" y="53" width="1" height="10" fill="rgba(255,255,255,0.07)"/>
+          <rect x="74" y="53" width="1" height="10" fill="rgba(255,255,255,0.07)"/>
+          <rect x="88" y="53" width="1" height="10" fill="rgba(255,255,255,0.07)"/>
+          <line x1="18" y1="64" x2="102" y2="64" stroke="rgba(6,182,212,0.3)" stroke-width="0.7"/>
+        </g>
+        <g filter="url(#nvglow)">
+          <text x="60" y="85" dominant-baseline="middle" text-anchor="middle" font-family="'Arial Black','Impact',sans-serif" font-weight="900" font-size="32" fill="url(#nvvg)">V</text>
+        </g>
+        <rect x="18" y="50" width="20" height="4" rx="2" fill="#1e1e28" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+        <circle cx="24" cy="52" r="2" fill="#111116" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>
+        <circle cx="24" cy="52" r="0.7" fill="rgba(34,211,238,0.45)"/>
+        <circle cx="31" cy="52" r="2" fill="#111116" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>
+        <circle cx="31" cy="52" r="0.7" fill="rgba(34,211,238,0.45)"/>
+        <g transform="rotate(-18, 18, 52)">
+          <rect x="18" y="38" width="84" height="14" rx="2" fill="url(#nvarm)"/>
+          <g clip-path="url(#nvac)">
+            <rect x="18" y="38" width="84" height="14" fill="#131318"/>
+            <rect x="18" y="38" width="14" height="14" fill="#1e1e28"/>
+            <rect x="46" y="38" width="14" height="14" fill="#1e1e28"/>
+            <rect x="74" y="38" width="14" height="14" fill="#1e1e28"/>
+            <line x1="32" y1="38" x2="32" y2="52" stroke="rgba(255,255,255,0.06)" stroke-width="0.6"/>
+            <line x1="46" y1="38" x2="46" y2="52" stroke="rgba(255,255,255,0.06)" stroke-width="0.6"/>
+            <line x1="60" y1="38" x2="60" y2="52" stroke="rgba(255,255,255,0.06)" stroke-width="0.6"/>
+            <line x1="74" y1="38" x2="74" y2="52" stroke="rgba(255,255,255,0.06)" stroke-width="0.6"/>
+            <line x1="88" y1="38" x2="88" y2="52" stroke="rgba(255,255,255,0.06)" stroke-width="0.6"/>
+          </g>
+          <line x1="18" y1="51.3" x2="102" y2="51.3" stroke="rgba(6,182,212,0.22)" stroke-width="0.6"/>
+          <rect x="18" y="38" width="84" height="14" rx="2" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
+        </g>
+      </svg>
+      <h1>Nebula<br>Vantage</h1>
     </div>
-  </section>
-
-  <!-- DOWNLOADS -->
-  <section id="downloads">
-    <div class="section-label">Downloads</div>
-    <h2 class="section-title">Get Nebula Vantage</h2>
-    <p class="section-sub">Free and open source. Currently available as a beta AppImage.</p>
-
-    <div class="beta-warning">
-      <span class="icon">⚠️</span>
-      <div>
-        <strong>Beta software — use at your own risk.</strong> This is an early, unstable build.
-        Features may be incomplete, broken, or change without notice. Feedback and bug reports are welcome on
-        <a href="https://github.com/VisorVP/nebula-vantage/issues" style="color:var(--beta)">GitHub Issues</a>.
-      </div>
+    <div class="hero-tags">
+      <span class="hero-tag beta">v2.2.22-beta</span>
+      <span class="hero-tag">GTK4</span>
+      <span class="hero-tag">Python</span>
+      <span class="hero-tag">Open Source</span>
     </div>
+    <p>A modern media player for Linux. Audio &amp; video playback, smart playlists, custom image icons, and a clean dark/light interface. Currently in beta.</p>
+    <div class="hero-btns">
+      <a href="https://github.com/VisorVP/nebula-vantage/releases" target="_blank" class="btn-p">↓ Download Beta</a>
+      <a href="https://github.com/VisorVP/nebula-vantage" target="_blank" class="btn-o">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.268 2.75 1.026A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.026 2.747-1.026.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        View Source
+      </a>
+    </div>
+  </div>
 
-    <div class="downloads-grid">
-
-      <div class="dl-card beta">
-        <div class="dl-status beta-status">⚠ Beta</div>
-        <div class="dl-name">AppImage</div>
-        <div class="dl-desc">Portable — no installation needed. Download, make executable, and run.</div>
-        <div class="dl-code">
-          <span class="cmd">chmod +x</span> NebulaVantage-v2.2.22-beta-x86_64.AppImage<br>
-          ./NebulaVantage-v2.2.22-beta-x86_64.AppImage
+  <!-- Mockup -->
+  <div class="mockup">
+    <div class="mbar"><div class="md r"></div><div class="md y"></div><div class="md g"></div><div class="mtitle">Nebula Vantage</div></div>
+    <div class="mbody">
+      <div class="mv-sidebar">
+        <div class="mv-logo">
+          <svg class="mv-logo-icon" viewBox="0 0 120 120" fill="none"><defs><radialGradient id="mlbg" cx="30%" cy="30%" r="80%"><stop offset="0%" stop-color="#0f2040"/><stop offset="100%" stop-color="#020810"/></radialGradient><linearGradient id="mlvg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#2563eb"/></linearGradient><linearGradient id="mlboard" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#1c1c22"/><stop offset="100%" stop-color="#0e0e12"/></linearGradient><linearGradient id="mlarm" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#252530"/><stop offset="100%" stop-color="#16161e"/></linearGradient><filter id="mlglow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><clipPath id="mlbc"><rect x="18" y="52" width="84" height="54" rx="5"/></clipPath><clipPath id="mlac"><rect x="18" y="38" width="84" height="14"/></clipPath></defs><rect width="120" height="120" rx="26" fill="url(#mlbg)"/><rect x="18" y="52" width="84" height="54" rx="5" fill="url(#mlboard)"/><rect x="18" y="52" width="84" height="54" rx="5" fill="none" stroke="rgba(6,182,212,0.3)" stroke-width="0.8"/><g clip-path="url(#mlbc)"><rect x="18" y="52" width="84" height="12" fill="#131318"/><line x1="18" y1="64" x2="102" y2="64" stroke="rgba(6,182,212,0.3)" stroke-width="0.7"/></g><g filter="url(#mlglow)"><text x="60" y="85" dominant-baseline="middle" text-anchor="middle" font-family="'Arial Black','Impact',sans-serif" font-weight="900" font-size="32" fill="url(#mlvg)">V</text></g><g transform="rotate(-18, 18, 52)"><rect x="18" y="38" width="84" height="14" rx="2" fill="url(#mlarm)"/><g clip-path="url(#mlac)"><rect x="18" y="38" width="84" height="14" fill="#131318"/><rect x="18" y="38" width="14" height="14" fill="#1e1e28"/><rect x="46" y="38" width="14" height="14" fill="#1e1e28"/><rect x="74" y="38" width="14" height="14" fill="#1e1e28"/></g><line x1="18" y1="51.3" x2="102" y2="51.3" stroke="rgba(6,182,212,0.22)" stroke-width="0.6"/></g></svg>
+          <div><div class="mv-logo-text">Nebula Vantage</div><div class="mv-logo-sub">MEDIA PLAYER</div></div>
         </div>
-        <a href="https://github.com/VisorVP/nebula-vantage/releases" class="dl-btn beta-btn">⬇ Download Beta AppImage</a>
+        <div class="mv-section">Media</div>
+        <div class="mv-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="2"/><polygon points="10,8 16,12 10,16"/></svg>Videos</div>
+        <div class="mv-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Music</div>
+        <div class="mv-section">Library</div>
+        <div class="mv-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Playlists</div>
+        <div class="mv-pl-item">🎸 Rock Mix</div>
+        <div class="mv-pl-item">🔥 Favourites</div>
       </div>
-
-      <div class="dl-card">
-        <div class="dl-status soon">Coming Soon</div>
-        <div class="dl-name">Flatpak</div>
-        <div class="dl-desc">Universal build for all Linux distros with Flatpak installed.</div>
-        <div class="dl-code">flatpak install flathub org.nebulaprojects.vantage</div>
-        <span class="dl-btn disabled">Not Available Yet</span>
-      </div>
-
-      <div class="dl-card">
-        <div class="dl-status soon">Coming Soon</div>
-        <div class="dl-name">Debian / Ubuntu</div>
-        <div class="dl-desc">For Ubuntu, Debian, AnduinOS and all .deb-based distros.</div>
-        <div class="dl-code">
-          <span class="cmd">sudo dpkg -i</span> nebula-vantage_*.deb<br>
-          <span class="cmd">sudo apt-get install -f</span>
+      <div class="mv-main">
+        <div class="mv-main-title">Playlists</div>
+        <div class="mv-pl-card">
+          <div class="mv-pl-thumb">🎸</div>
+          <div class="mv-pl-info"><div class="mv-pl-name">Rock Mix</div><div class="mv-pl-count">12 tracks</div></div>
+          <button class="mv-pl-play">▶ Play</button>
         </div>
-        <span class="dl-btn disabled">Not Available Yet</span>
+        <div class="mv-track">
+          <div class="mv-track-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+          <div><div class="mv-track-name">Bohemian Rhapsody</div><div class="mv-track-artist">Queen · 5:55</div></div>
+        </div>
+        <div class="mv-track">
+          <div class="mv-track-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+          <div><div class="mv-track-name">Hotel California</div><div class="mv-track-artist">Eagles · 6:31</div></div>
+        </div>
+        <div class="mv-track">
+          <div class="mv-track-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+          <div><div class="mv-track-name">Stairway to Heaven</div><div class="mv-track-artist">Led Zeppelin · 8:02</div></div>
+        </div>
+        <div class="mv-playbar">
+          <div class="mv-pb-info">
+            <div class="mv-pb-btn"><svg viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div>
+            <div><div class="mv-pb-track">Bohemian Rhapsody</div><div class="mv-pb-artist">Queen</div></div>
+            <div class="mv-pb-time">2:02 / 5:55</div>
+          </div>
+          <div class="mv-progress"><div class="mv-progress-fill"></div></div>
+        </div>
       </div>
-
-      <div class="dl-card">
-        <div class="dl-status soon">Coming Soon</div>
-        <div class="dl-name">Fedora / RHEL</div>
-        <div class="dl-desc">For Fedora, RHEL, Bazzite and all .rpm-based distros.</div>
-        <div class="dl-code"><span class="cmd">sudo dnf install</span> nebula-vantage_*.rpm</div>
-        <span class="dl-btn disabled">Not Available Yet</span>
-      </div>
-
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FOOTER -->
-  <footer>
-    Made with care by <a href="https://github.com/VisorVP">Nebula Projects</a>
-    <span class="sep">·</span>
-    <a href="https://github.com/VisorVP/nebula-vantage">GitHub</a>
-    <span class="sep">·</span>
-    <a href="https://nebula-projectz.github.io/index.html">All Apps</a>
-  </footer>
+<section class="sec" id="features">
+  <div class="eyebrow">Features</div>
+  <div class="sec-title">Everything you need</div>
+  <div class="sec-sub">Built from scratch with GTK4 and Python. No Electron, no bloat.</div>
+  <div class="feat-grid">
+    <div class="fc"><div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><polygon points="10,8 16,12 10,16"/></svg></div><h3>Audio &amp; Video</h3><p>Full media playback via GStreamer. Play music, movies, and everything in between.</p></div>
+    <div class="fc"><div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><h3>Smart Playlists</h3><p>Create, edit, and organize playlists. Collapsible sidebar tree keeps everything tidy.</p></div>
+    <div class="fc"><div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg></div><h3>Dark &amp; Light Mode</h3><p>Fully themed dark and light interface with smooth transitions and accent colors.</p></div>
+    <div class="fc"><div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><h3>Custom Icons</h3><p>Assign custom PNG or JPG images as icons for playlists and tracks. Your library, your style.</p></div>
+    <div class="fc"><div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><h3>Metadata Reading</h3><p>Reads tags via Mutagen — title, artist, album, and duration shown automatically.</p></div>
+    <div class="fc"><div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h3>Native Performance</h3><p>GTK4 + GStreamer. Hardware-accelerated, snappy, and lightweight by design.</p></div>
+  </div>
+</section>
 
-  <script>
-    // Theme toggle
-    function toggleTheme() {
-      const html = document.documentElement;
-      const current = html.getAttribute('data-theme');
-      html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-      document.querySelector('.theme-btn').textContent = current === 'dark' ? '🌙' : '☀';
-      localStorage.setItem('nv-theme', current === 'dark' ? 'light' : 'dark');
-    }
-    // Restore saved theme
-    const saved = localStorage.getItem('nv-theme');
-    if (saved) {
-      document.documentElement.setAttribute('data-theme', saved);
-      document.querySelector('.theme-btn').textContent = saved === 'dark' ? '☀' : '🌙';
-    }
-  </script>
+<section class="sec" id="downloads">
+  <div class="eyebrow">Downloads</div>
+  <div class="sec-title">Get Nebula Vantage</div>
+  <div class="sec-sub">Free and open source. Currently in beta — pick your format below.</div>
+  <div class="dl-list">
+    <div class="dl-row">
+      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#f97316" stroke-width="1.8"/><path d="M8 16l4-8 4 8M9.5 13h5" stroke="#f97316" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div class="dl-info"><h3>AppImage <span class="badge b-ok">Beta</span></h3><p>Portable — no installation, just download and run</p><div class="dl-cmd" id="c1"><span>chmod +x NebulaVantage-*.AppImage && ./NebulaVantage-*.AppImage</span><button class="cp" onclick="cp('c1')">⧉</button></div></div>
+      <div class="dl-acts"><a href="https://github.com/VisorVP/nebula-vantage/releases" target="_blank" class="dl-btn av">↓ Download</a></div>
+    </div>
+    <div class="dl-row soon">
+      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3L3 8l9 5 9-5-9-5zM3 16l9 5 9-5M3 12l9 5 9-5" stroke="#4A90D9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="dl-info"><h3>Flatpak <span class="badge b-soon">Coming Soon</span></h3><p>Universal — all Linux distros with Flatpak</p><div class="dl-cmd" id="c2"><span>flatpak install flathub org.nebulaprojects.vantage</span><button class="cp" onclick="cp('c2')">⧉</button></div></div>
+      <div class="dl-acts"><span class="dl-btn na">Coming Soon</span></div>
+    </div>
+    <div class="dl-row soon">
+      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="#A81D33"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zm0 13.5c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08s5.97 1.09 6 3.08c-1.29 1.94-3.5 3.22-6 3.22z"/></svg></div>
+      <div class="dl-info"><h3>Debian / Ubuntu <span class="badge b-soon">Coming Soon</span></h3><p>For Ubuntu, Debian, AnduinOS and all .deb-based distros</p><div class="dl-cmd" id="c3"><span>sudo dpkg -i nebula-vantage_*.deb && sudo apt-get install -f</span><button class="cp" onclick="cp('c3')">⧉</button></div></div>
+      <div class="dl-acts"><span class="dl-btn na">Coming Soon</span></div>
+    </div>
+    <div class="dl-row soon">
+      <div class="dl-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6c-2 0-3.77-.98-4.87-2.5" stroke="#51A2DA" stroke-width="1.8" stroke-linecap="round"/><path d="M12 12c0 3.31-2.69 6-6 6S0 15.31 0 12s2.69-6 6-6c2 0 3.77.98 4.87 2.5" stroke="#51A2DA" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div class="dl-info"><h3>Fedora / RHEL <span class="badge b-soon">Coming Soon</span></h3><p>For Fedora, RHEL, Bazzite and all .rpm-based distros</p><div class="dl-cmd" id="c4"><span>sudo dnf install nebula-vantage-*.rpm</span><button class="cp" onclick="cp('c4')">⧉</button></div></div>
+      <div class="dl-acts"><span class="dl-btn na">Coming Soon</span></div>
+    </div>
+  </div>
+</section>
+</main>
 
+<footer>
+  Made with care by <a href="https://github.com/VisorVP" target="_blank">Nebula Projects</a> ·
+  <a href="https://github.com/VisorVP/nebula-vantage" target="_blank">GitHub</a> ·
+  <a href="index.html">All Apps</a>
+</footer>
+
+<div class="theme-pill" id="themePill">
+  <div class="pill-inner" id="pillInner">
+    <button class="pill-btn active" id="pillDark" onclick="setPillTheme('dark')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>Dark
+    </button>
+    <div class="pill-sep"></div>
+    <button class="pill-btn" id="pillLight" onclick="setPillTheme('light')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Light
+    </button>
+    <div class="pill-sep"></div>
+  </div>
+  <button class="pill-collapse" id="pillCollapse" onclick="togglePill()" title="Hide/Show">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+</div>
+
+<script>
+const canvas=document.getElementById('bg-canvas'),ctx=canvas.getContext('2d');
+let stars=[],animEnabled=true,animId;
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+function initStars(){stars=[];for(let i=0;i<200;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.3+0.2,speed:Math.random()*0.12+0.02,opacity:Math.random()*0.7+0.1,twinkleSpeed:Math.random()*0.02+0.005,twinklePhase:Math.random()*Math.PI*2,isTeal:Math.random()>0.6});}
+function loop(){if(!animEnabled)return;ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.twinklePhase+=s.twinkleSpeed;const op=s.opacity*(0.5+0.5*Math.sin(s.twinklePhase));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.isTeal?`rgba(34,211,238,${op})`:`rgba(147,197,253,${op})`;ctx.fill();s.y+=s.speed;if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width;}});animId=requestAnimationFrame(loop);}
+resize();initStars();loop();
+window.addEventListener('resize',()=>{resize();initStars();});
+function toggleSettings(){document.getElementById('sp').classList.toggle('open');}
+function togglePill(){const inner=document.getElementById('pillInner'),btn=document.getElementById('pillCollapse'),collapsed=inner.classList.toggle('hidden');btn.classList.toggle('collapsed',collapsed);}
+document.addEventListener('click',e=>{if(!e.target.closest('.settings-wrap'))document.getElementById('sp').classList.remove('open');});
+function setTheme(cb){setPillTheme(cb.checked?'dark':'light');}
+function setPillTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('nv-theme',t);document.getElementById('darkT').checked=t==='dark';document.getElementById('pillDark').classList.toggle('active',t==='dark');document.getElementById('pillLight').classList.toggle('active',t==='light');}
+function showCmds(cb){document.querySelectorAll('.dl-cmd').forEach(el=>el.style.display=cb.checked?'flex':'none');}
+function toggleAnim(cb){animEnabled=cb.checked;if(animEnabled)loop();else{cancelAnimationFrame(animId);ctx.clearRect(0,0,canvas.width,canvas.height);}}
+function cp(id){const txt=document.getElementById(id).querySelector('span').textContent;navigator.clipboard.writeText(txt).then(()=>{const btn=document.getElementById(id).querySelector('.cp');btn.textContent='✓';setTimeout(()=>btn.textContent='⧉',1500);});}
+(function(){const t=localStorage.getItem('nv-theme')||'dark';document.documentElement.setAttribute('data-theme',t);document.getElementById('darkT').checked=t==='dark';document.getElementById('pillDark').classList.toggle('active',t==='dark');document.getElementById('pillLight').classList.toggle('active',t==='light');})();
+</script>
 </body>
 </html>
